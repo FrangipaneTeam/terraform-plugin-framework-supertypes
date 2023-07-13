@@ -10,6 +10,7 @@ import (
 	"go/format"
 	"html/template"
 	"os"
+	"strings"
 
 	"github.com/iancoleman/strcase"
 )
@@ -51,20 +52,24 @@ func main() {
 		generateTemplate(t, templateSimpleType, templateSimpleValue)
 	}
 
-	// // * Array types
-	// for _, t := range typesArray {
-	// 	generateTemplate(t, templateArrayType, templateArrayValue)
-	// }
+	// * Array types
+	for _, t := range typesArray {
+		generateTemplate(t, templateArrayType, templateArrayValue)
+	}
 
-	// // * Nested types
-	// for _, t := range typesNested {
-	// 	generateTemplate(t, templateNestedType, templateNestedValue)
-	// }
+	// * Nested types
+	for _, t := range typesNested {
+		generateTemplate(t, templateNestedType, templateNestedValue)
+	}
 }
 
 func generateTemplate(typeName, templateType, templateValue string) {
 	infos := templateInfos{
 		TypeName: strcase.ToCamel(typeName),
+	}
+
+	if strings.HasSuffix(typeName, "_nested") {
+		infos.TypeName = strcase.ToCamel(strings.TrimSuffix(typeName, "_nested"))
 	}
 
 	tmplType, err := template.New("template").Parse(templateType)

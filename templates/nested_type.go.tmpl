@@ -1,0 +1,99 @@
+package supertypes
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+	"github.com/hashicorp/terraform-plugin-go/tftypes"
+)
+
+// Ensure the implementation satisfies the expected interfaces.
+var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}NestedType{}
+
+type {{ .TypeName }}NestedType struct {
+	basetypes.{{ .TypeName }}Type
+}
+
+// func (t {{ .TypeName }}NestedType) Equal(o attr.Type) bool {
+// 	other, ok := o.(basetypes.{{ .TypeName }}Type)
+
+// 	if !ok {
+// 		return false
+// 	}
+
+// 	return t.{{ .TypeName }}Type.Equal(other)
+// }
+
+func (t {{ .TypeName }}NestedType) String() string {
+	return "types.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
+}
+
+func (t {{ .TypeName }}NestedType) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
+	// Custom{{ .TypeName }}Value defined in the value type section
+	value := {{ .TypeName }}NestedValue{
+		{{ .TypeName }}Value: in,
+	}
+
+	return value, nil
+}
+
+func (t {{ .TypeName }}NestedType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.{{ .TypeName }}Type.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	{{ .TypeName }}Value, ok := attrValue.(basetypes.{{ .TypeName }}Value)
+
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	stringValuable, diags := t.ValueFrom{{ .TypeName }}(ctx, {{ .TypeName }}Value)
+
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
+	}
+
+	return stringValuable, nil
+}
+
+// // TerraformType returns the tftypes.Type that should be used to
+// // represent this type. This constrains what user input will be
+// // accepted and what kind of data can be set in state. The framework
+// // will use this to translate the AttributeType to something Terraform
+// // can understand.
+func (t {{ .TypeName }}NestedType) TerraformType(ctx context.Context) tftypes.Type {
+	return tftypes.{{ .TypeName }}{
+		ElementType: t.{{ .TypeName }}Type.ElementType().TerraformType(ctx),
+	}
+}
+
+// GetType returns {{ .TypeName }}Type of ObjectType or CustomType.
+// func (a {{ .TypeName }}NestedType) GetType() attr.Type {
+// 	if a.CustomType != nil {
+// 		return a.CustomType
+// 	}
+
+// 	return types.{{ .TypeName }}Type{
+// 		ElemType: a.NestedObject.Type(),
+// 	}
+// }
+
+func (t {{ .TypeName }}NestedType) ElementType() attr.Type {
+	if t.{{ .TypeName }}Type.ElemType == nil {
+		return missingType{}
+	}
+
+	return t.{{ .TypeName }}Type.ElemType
+}
+
+// func (t {{ .TypeName }}NestedType) ValueType(ctx context.Context) attr.Value {
+// 	// Custom{{ .TypeName }}Value defined in the value type section
+// 	return {{ .TypeName }}Value{
+// 		{{ .TypeName }}Value: t.{{ .TypeName }}Type.ValueType(ctx).(basetypes.{{ .TypeName }}Value),
+// 	}
+// }
