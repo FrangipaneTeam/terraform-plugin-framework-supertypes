@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/hashicorp/terraform-plugin-framework v1.3.2
 	github.com/hashicorp/terraform-plugin-go v0.18.0
+	github.com/iancoleman/strcase v0.3.0
 )
 
 require (
