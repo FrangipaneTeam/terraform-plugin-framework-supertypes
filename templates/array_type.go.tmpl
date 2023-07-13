@@ -11,71 +11,71 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.ListTypable = ListType{}
+var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}Type{}
 
-type ListType struct {
-	basetypes.ListType
+type {{ .TypeName }}Type struct {
+	basetypes.{{ .TypeName }}Type
 }
 
-func (t ListType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.ListType)
+func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
+	other, ok := o.(basetypes.{{ .TypeName }}Type)
 
 	if !ok {
 		return false
 	}
 
-	return t.ListType.Equal(other)
+	return t.{{ .TypeName }}Type.Equal(other)
 }
 
-func (t ListType) String() string {
-	return "types.ListType[" + t.ElementType().String() + "]"
+func (t {{ .TypeName }}Type) String() string {
+	return "types.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
 }
 
-func (t ListType) ValueFromList(_ context.Context, in basetypes.ListValue) (basetypes.ListValuable, diag.Diagnostics) {
-	value := ListValue{
-		ListValue: in,
+func (t {{ .TypeName }}Type) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
+	value := {{ .TypeName }}Value{
+		{{ .TypeName }}Value: in,
 	}
 
 	return value, nil
 }
 
-func (t ListType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
-	attrValue, err := t.ListType.ValueFromTerraform(ctx, in)
+func (t {{ .TypeName }}Type) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.{{ .TypeName }}Type.ValueFromTerraform(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 
-	ListValue, ok := attrValue.(basetypes.ListValue)
+	{{ .TypeName }}Value, ok := attrValue.(basetypes.{{ .TypeName }}Value)
 
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
-	listValuable, diags := t.ValueFromList(ctx, ListValue)
+	{{ .TypeName }}Valuable, diags := t.ValueFrom{{ .TypeName }}(ctx, {{ .TypeName }}Value)
 
 	if diags.HasError() {
-		return nil, fmt.Errorf("unexpected error converting ListValue to ListValuable: %v", diags)
+		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
 	}
 
-	return listValuable, nil
+	return {{ .TypeName }}Valuable, nil
 }
 
-func (t ListType) TerraformType(ctx context.Context) tftypes.Type {
-	return tftypes.List{
+func (t {{ .TypeName }}Type) TerraformType(ctx context.Context) tftypes.Type {
+	return tftypes.{{ .TypeName }}{
 		ElementType: t.ElementType().TerraformType(ctx),
 	}
 }
 
-func (t ListType) ElementType() attr.Type {
-	if t.ListType.ElemType == nil {
+func (t {{ .TypeName }}Type) ElementType() attr.Type {
+	if t.{{ .TypeName }}Type.ElemType == nil {
 		return missingType{}
 	}
 
-	return t.ListType.ElemType
+	return t.{{ .TypeName }}Type.ElemType
 }
 
-func (t ListType) ValueType(ctx context.Context) attr.Value {
-	return ListValue{
-		ListValue: t.ListType.ValueType(ctx).(basetypes.ListValue),
+func (t {{ .TypeName }}Type) ValueType(ctx context.Context) attr.Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: t.{{ .TypeName }}Type.ValueType(ctx).(basetypes.{{ .TypeName }}Value),
 	}
 }

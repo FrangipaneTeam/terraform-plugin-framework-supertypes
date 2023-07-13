@@ -1,0 +1,72 @@
+package supertypes
+
+import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+)
+
+// Ensure the implementation satisfies the expected interfaces.
+var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+
+type {{ .TypeName }}Value struct {
+	basetypes.{{ .TypeName }}Value
+}
+
+func (v {{ .TypeName }}Value) Equal(o attr.Value) bool {
+	other, ok := o.({{ .TypeName }}Value)
+
+	if !ok {
+		return false
+	}
+
+	return v.{{ .TypeName }}Value.Equal(other.{{ .TypeName }}Value)
+}
+
+func (v {{ .TypeName }}Value) Type(ctx context.Context) attr.Type {
+	// Custom{{ .TypeName }}Type defined in the schema type section
+	return v.{{ .TypeName }}Value.Type(ctx)
+}
+
+func (v {{ .TypeName }}Value) To{{ .TypeName }}Value(_ context.Context) (basetypes.{{ .TypeName }}Value, diag.Diagnostics) {
+	return v.{{ .TypeName }}Value, nil
+}
+
+func {{ .TypeName }}Null(elementType attr.Type) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(elementType),
+	}
+}
+
+func {{ .TypeName }}Unknown(elementType attr.Type) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(elementType),
+	}
+}
+
+// * CustomFunc
+
+func (v *{{ .TypeName }}Value) Get(ctx context.Context, target interface{}, allowUnhandled bool) (diag diag.Diagnostics) {
+	return v.{{ .TypeName }}Value.ElementsAs(ctx, target, allowUnhandled)
+}
+
+func (v *{{ .TypeName }}Value) Set(ctx context.Context, elements any) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.{{ .TypeName }}Value, d = types.{{ .TypeName }}ValueFrom(ctx, v.ElementType(ctx), elements)
+	return d
+}
+
+func (v *{{ .TypeName }}Value) SetNull(ctx context.Context) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Null(v.ElementType(ctx))
+}
+
+func (v *{{ .TypeName }}Value) SetUnknown(ctx context.Context) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Unknown(v.ElementType(ctx))
+}
+
+func (v {{ .TypeName }}Value) IsKnown() bool {
+	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}
