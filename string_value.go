@@ -2,7 +2,6 @@ package supertypes
 
 import (
 	"context"
-
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
 )
@@ -25,7 +24,6 @@ func (v StringValue) Equal(o attr.Value) bool {
 }
 
 func (v StringValue) Type(_ context.Context) attr.Type {
-	// CustomStringType defined in the schema type section
 	return StringType{}
 }
 
@@ -47,15 +45,15 @@ func (v *StringValue) Get() string {
 	return v.StringValue.ValueString()
 }
 
-func (v *StringValue) Set(s string) {
+func (v StringValue) Set(s string) {
 	v.StringValue = basetypes.NewStringValue(s)
 }
 
-func (v *StringValue) SetNull() {
+func (v StringValue) SetNull() {
 	v.StringValue = basetypes.NewStringNull()
 }
 
-func (v *StringValue) SetUnknown() {
+func (v StringValue) SetUnknown() {
 	v.StringValue = basetypes.NewStringUnknown()
 }
 

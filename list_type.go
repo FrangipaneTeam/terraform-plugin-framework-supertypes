@@ -32,7 +32,6 @@ func (t ListType) String() string {
 }
 
 func (t ListType) ValueFromList(_ context.Context, in basetypes.ListValue) (basetypes.ListValuable, diag.Diagnostics) {
-	// CustomListValue defined in the value type section
 	value := ListValue{
 		ListValue: in,
 	}
@@ -52,20 +51,15 @@ func (t ListType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
-	stringValuable, diags := t.ValueFromList(ctx, ListValue)
+	ListValuable, diags := t.ValueFromList(ctx, ListValue)
 
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting ListValue to ListValuable: %v", diags)
 	}
 
-	return stringValuable, nil
+	return ListValuable, nil
 }
 
-// TerraformType returns the tftypes.Type that should be used to
-// represent this type. This constrains what user input will be
-// accepted and what kind of data can be set in state. The framework
-// will use this to translate the AttributeType to something Terraform
-// can understand.
 func (t ListType) TerraformType(ctx context.Context) tftypes.Type {
 	return tftypes.List{
 		ElementType: t.ElementType().TerraformType(ctx),
@@ -81,7 +75,6 @@ func (t ListType) ElementType() attr.Type {
 }
 
 func (t ListType) ValueType(ctx context.Context) attr.Value {
-	// CustomListValue defined in the value type section
 	return ListValue{
 		ListValue: t.ListType.ValueType(ctx).(basetypes.ListValue),
 	}

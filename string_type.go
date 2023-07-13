@@ -32,7 +32,6 @@ func (t StringType) String() string {
 }
 
 func (t StringType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {
-	// CustomStringValue defined in the value type section
 	value := StringValue{
 		StringValue: in,
 	}
@@ -46,22 +45,21 @@ func (t StringType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 		return nil, err
 	}
 
-	stringValue, ok := attrValue.(basetypes.StringValue)
+	StringValue, ok := attrValue.(basetypes.StringValue)
 
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
-	stringValuable, diags := t.ValueFromString(ctx, stringValue)
+	StringValuable, diags := t.ValueFromString(ctx, StringValue)
 
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting StringValue to StringValuable: %v", diags)
 	}
 
-	return stringValuable, nil
+	return StringValuable, nil
 }
 
 func (t StringType) ValueType(_ context.Context) attr.Value {
-	// CustomStringValue defined in the value type section
 	return StringValue{}
 }

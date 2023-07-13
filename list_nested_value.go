@@ -16,18 +16,7 @@ type ListNestedValue struct {
 	basetypes.ListValue
 }
 
-// func (v ListNestedValue) Equal(o attr.Value) bool {
-// 	other, ok := o.(ListValue)
-
-// 	if !ok {
-// 		return false
-// 	}
-
-// 	return v.ListValue.Equal(other.ListValue)
-// }
-
 func (v ListNestedValue) Type(ctx context.Context) attr.Type {
-	// CustomListNestedType defined in the schema type section
 	return v.ListValue.Type(ctx)
 }
 

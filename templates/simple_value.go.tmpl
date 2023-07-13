@@ -1,0 +1,65 @@
+package supertypes
+
+import (
+	"context"
+    {{- if eq .TypeName "Number" }}
+	"math/big"
+    {{ end }}
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+)
+
+// Ensure the implementation satisfies the expected interfaces.
+var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+
+type {{ .TypeName }}Value struct {
+	basetypes.{{ .TypeName }}Value
+}
+
+func (v {{ .TypeName }}Value) Equal(o attr.Value) bool {
+	other, ok := o.({{ .TypeName }}Value)
+
+	if !ok {
+		return false
+	}
+
+	return v.{{ .TypeName }}Value.Equal(other.{{ .TypeName }}Value)
+}
+
+func (v {{ .TypeName }}Value) Type(_ context.Context) attr.Type {
+	return {{ .TypeName }}Type{}
+}
+
+func {{ .TypeName }}Null() {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(),
+	}
+}
+
+func {{ .TypeName }}Unknown() {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(),
+	}
+}
+
+// * CustomFunc
+
+func (v *{{ .TypeName }}Value) Get() {{ if eq .TypeName "String" }}string{{ else if eq .TypeName "Int64" }}int64{{ else if eq .TypeName "Float64" }}float64{{ else if eq .TypeName "Bool" }}bool{{ else if eq .TypeName "Number"}}*big.Float{{ end }} {
+	return v.{{ .TypeName }}Value.Value{{  if eq .TypeName "Number"}}BigFloat{{else}}{{ .TypeName }}{{end}}()
+}
+
+func (v {{ .TypeName }}Value) Set(s {{ if eq .TypeName "String" }}string{{ else if eq .TypeName "Int64" }}int64{{ else if eq .TypeName "Float64" }}float64{{ else if eq .TypeName "Bool" }}bool{{ else if eq .TypeName "Number"}}*big.Float{{ end }}) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Value(s)
+}
+
+func (v {{ .TypeName }}Value) SetNull() {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Null()
+}
+
+func (v {{ .TypeName }}Value) SetUnknown() {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Unknown()
+}
+
+func (v {{ .TypeName }}Value) IsKnown() bool {
+	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}

@@ -1,0 +1,61 @@
+package supertypes
+
+import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+)
+
+// Ensure the implementation satisfies the expected interfaces.
+var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+
+type {{ .TypeName }}NestedValue struct {
+	basetypes.{{ .TypeName }}Value
+}
+
+func (v {{ .TypeName }}NestedValue) Type(ctx context.Context) attr.Type {
+	return v.{{ .TypeName }}Value.Type(ctx)
+}
+
+func (v {{ .TypeName }}NestedValue) To{{ .TypeName }}Value(_ context.Context) (basetypes.{{ .TypeName }}Value, diag.Diagnostics) {
+	return v.{{ .TypeName }}Value, nil
+}
+
+func {{ .TypeName }}NestedNull(elementType attr.Type) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(elementType),
+	}
+}
+
+func {{ .TypeName }}NestedUnknown(elementType attr.Type) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(elementType),
+	}
+}
+
+// * CustomFunc
+
+func (v *{{ .TypeName }}NestedValue) Get(ctx context.Context, target interface{}, allowUnhandled bool) (diag diag.Diagnostics) {
+	return v.{{ .TypeName }}Value.ElementsAs(ctx, target, allowUnhandled)
+}
+
+func (v *{{ .TypeName }}NestedValue) Set(ctx context.Context, elements any) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.{{ .TypeName }}Value, d = types.{{ .TypeName }}ValueFrom(ctx, v.ElementType(ctx), elements)
+	return d
+}
+
+func (v *{{ .TypeName }}NestedValue) SetNull(ctx context.Context) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Null(v.ElementType(ctx))
+}
+
+func (v *{{ .TypeName }}NestedValue) SetUnknown(ctx context.Context) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Unknown(v.ElementType(ctx))
+}
+
+func (v {{ .TypeName }}NestedValue) IsKnown() bool {
+	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}
