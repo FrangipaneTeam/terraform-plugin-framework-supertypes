@@ -1,0 +1,66 @@
+package supertypes
+
+import (
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/attr"
+	"github.com/hashicorp/terraform-plugin-framework/diag"
+	"github.com/hashicorp/terraform-plugin-framework/types/basetypes"
+)
+
+// Ensure the implementation satisfies the expected interfaces.
+var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+
+type {{ .TypeName }}Value struct {
+	basetypes.{{ .TypeName }}Value
+}
+
+func (v {{ .TypeName }}Value) Equal(o attr.Value) bool {
+	other, ok := o.({{ .TypeName }}Value)
+
+	if !ok {
+		return false
+	}
+
+	return v.{{ .TypeName }}Value.Equal(other.{{ .TypeName }}Value)
+}
+
+func (v {{ .TypeName }}Value) Type(_ context.Context) attr.Type {
+	return {{ .TypeName }}Type{}
+}
+
+func {{ .TypeName }}Null(attributeTypes map[string]attr.Type) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(attributeTypes),
+	}
+}
+
+func {{ .TypeName }}Unknown(attributeTypes map[string]attr.Type) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(attributeTypes),
+	}
+}
+
+// * CustomFunc
+
+func (v *{{ .TypeName }}Value) Get(ctx context.Context, target interface{}, opts basetypes.{{ .TypeName }}AsOptions) diag.Diagnostics {
+	return v.{{ .TypeName }}Value.As(ctx, target, opts)
+}
+
+func (v {{ .TypeName }}Value) Set(ctx context.Context, structure any) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.{{ .TypeName }}Value, d = basetypes.New{{ .TypeName }}ValueFrom(ctx, v.AttributeTypes(ctx), structure)
+	return d
+}
+
+func (v {{ .TypeName }}Value) SetNull(ctx context.Context) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Null(v.AttributeTypes(ctx))
+}
+
+func (v {{ .TypeName }}Value) SetUnknown(ctx context.Context) {
+	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Unknown(v.AttributeTypes(ctx))
+}
+
+func (v {{ .TypeName }}Value) IsKnown() bool {
+	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}
