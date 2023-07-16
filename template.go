@@ -8,9 +8,9 @@ import (
 	_ "embed"
 	"fmt"
 	"go/format"
-	"html/template"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/fatih/color"
 	"github.com/iancoleman/strcase"
@@ -27,6 +27,9 @@ var (
 type templateInfos struct {
 	TypeName string
 }
+
+//go:embed templates/common.go.tmpl
+var templateCommon string
 
 //go:embed templates/simple_type.go.tmpl
 var templateSimpleType string
@@ -111,13 +114,13 @@ func generateTemplate(typeName, templateType, templateValue string) {
 		infos.TypeName = strcase.ToCamel(strings.TrimSuffix(typeName, "_nested"))
 	}
 
-	tmplType, err := template.New("template").Parse(templateType)
+	tmplType, err := template.New("template").Parse(concatTemplate(templateType))
 	if err != nil {
 		fmt.Printf("error from template parse : %v\n", err)
 		os.Exit(1)
 	}
 
-	tmplValue, err := template.New("template").Parse(templateValue)
+	tmplValue, err := template.New("template").Parse(concatTemplate(templateValue))
 	if err != nil {
 		fmt.Printf("error from template parse : %v\n", err)
 		os.Exit(1)
@@ -162,4 +165,8 @@ func generateTemplate(typeName, templateType, templateValue string) {
 	}
 
 	green.Println("✔")
+}
+
+func concatTemplate(template string) string {
+	return templateCommon + template
 }
