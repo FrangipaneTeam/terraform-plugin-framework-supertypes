@@ -1,3 +1,4 @@
+{{ template "header" . -}}
 package supertypes
 
 import (
@@ -16,16 +17,6 @@ var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}NestedType{}
 type {{ .TypeName }}NestedType struct {
 	basetypes.{{ .TypeName }}Type
 }
-
-// func (t {{ .TypeName }}NestedType) Equal(o attr.Type) bool {
-// 	other, ok := o.(basetypes.{{ .TypeName }}Type)
-
-// 	if !ok {
-// 		return false
-// 	}
-
-// 	return t.{{ .TypeName }}Type.Equal(other)
-// }
 
 func (t {{ .TypeName }}NestedType) String() string {
 	return "types.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
@@ -61,27 +52,16 @@ func (t {{ .TypeName }}NestedType) ValueFromTerraform(ctx context.Context, in tf
 	return stringValuable, nil
 }
 
-// // TerraformType returns the tftypes.Type that should be used to
-// // represent this type. This constrains what user input will be
-// // accepted and what kind of data can be set in state. The framework
-// // will use this to translate the AttributeType to something Terraform
-// // can understand.
+// TerraformType returns the tftypes.Type that should be used to
+// represent this type. This constrains what user input will be
+// accepted and what kind of data can be set in state. The framework
+// will use this to translate the AttributeType to something Terraform
+// can understand.
 func (t {{ .TypeName }}NestedType) TerraformType(ctx context.Context) tftypes.Type {
 	return tftypes.{{ .TypeName }}{
 		ElementType: t.{{ .TypeName }}Type.ElementType().TerraformType(ctx),
 	}
 }
-
-// GetType returns {{ .TypeName }}Type of ObjectType or CustomType.
-// func (a {{ .TypeName }}NestedType) GetType() attr.Type {
-// 	if a.CustomType != nil {
-// 		return a.CustomType
-// 	}
-
-// 	return types.{{ .TypeName }}Type{
-// 		ElemType: a.NestedObject.Type(),
-// 	}
-// }
 
 func (t {{ .TypeName }}NestedType) ElementType() attr.Type {
 	if t.{{ .TypeName }}Type.ElemType == nil {
@@ -90,10 +70,3 @@ func (t {{ .TypeName }}NestedType) ElementType() attr.Type {
 
 	return t.{{ .TypeName }}Type.ElemType
 }
-
-// func (t {{ .TypeName }}NestedType) ValueType(ctx context.Context) attr.Value {
-// 	// Custom{{ .TypeName }}Value defined in the value type section
-// 	return {{ .TypeName }}Value{
-// 		{{ .TypeName }}Value: t.{{ .TypeName }}Type.ValueType(ctx).(basetypes.{{ .TypeName }}Value),
-// 	}
-// }

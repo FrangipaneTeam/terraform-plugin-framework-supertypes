@@ -4,6 +4,8 @@ package supertypes
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-framework/diag"
@@ -29,7 +31,22 @@ func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
 }
 
 func (t {{ .TypeName }}Type) String() string {
-	return "SuperTypesStringType"
+	var res strings.Builder
+	res.WriteString("types.ObjectType[")
+	keys := make([]string, 0, len(t.AttrTypes))
+	for k := range t.AttrTypes {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for pos, key := range keys {
+		if pos != 0 {
+			res.WriteString(", ")
+		}
+		res.WriteString(`"` + key + `":`)
+		res.WriteString(t.AttrTypes[key].String())
+	}
+	res.WriteString("]")
+	return res.String()
 }
 
 func (t {{ .TypeName }}Type) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
