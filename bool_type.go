@@ -22,7 +22,6 @@ type BoolType struct {
 
 func (t BoolType) Equal(o attr.Type) bool {
 	other, ok := o.(BoolType)
-
 	if !ok {
 		return false
 	}
@@ -31,7 +30,7 @@ func (t BoolType) Equal(o attr.Type) bool {
 }
 
 func (t BoolType) String() string {
-	return "SuperTypesStringType"
+	return "supertypes.BoolType{basetypes.BoolValue{}}"
 }
 
 func (t BoolType) ValueFromBool(_ context.Context, in basetypes.BoolValue) (basetypes.BoolValuable, diag.Diagnostics) {
@@ -49,13 +48,11 @@ func (t BoolType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	}
 
 	BoolValue, ok := attrValue.(basetypes.BoolValue)
-
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
 	BoolValuable, diags := t.ValueFromBool(ctx, BoolValue)
-
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting BoolValue to BoolValuable: %v", diags)
 	}
@@ -63,6 +60,8 @@ func (t BoolType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (att
 	return BoolValuable, nil
 }
 
-func (t BoolType) ValueType(_ context.Context) attr.Value {
-	return BoolValue{}
+func (t BoolType) ValueType(ctx context.Context) attr.Value {
+	return BoolValue{
+		BoolValue: t.BoolType.ValueType(ctx).(basetypes.BoolValue),
+	}
 }

@@ -20,7 +20,6 @@ type {{ .TypeName }}Type struct {
 
 func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
 	other, ok := o.({{ .TypeName }}Type)
-
 	if !ok {
 		return false
 	}
@@ -29,7 +28,7 @@ func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
 }
 
 func (t {{ .TypeName }}Type) String() string {
-	return "SuperTypesStringType"
+	return "supertypes.{{ .TypeName }}Type{basetypes.{{ .TypeName }}Value{}}"
 }
 
 func (t {{ .TypeName }}Type) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
@@ -47,13 +46,11 @@ func (t {{ .TypeName }}Type) ValueFromTerraform(ctx context.Context, in tftypes.
 	}
 
 	{{ .TypeName }}Value, ok := attrValue.(basetypes.{{ .TypeName }}Value)
-
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
 	{{ .TypeName }}Valuable, diags := t.ValueFrom{{ .TypeName }}(ctx, {{ .TypeName }}Value)
-
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
 	}
@@ -61,6 +58,8 @@ func (t {{ .TypeName }}Type) ValueFromTerraform(ctx context.Context, in tftypes.
 	return {{ .TypeName }}Valuable, nil
 }
 
-func (t {{ .TypeName }}Type) ValueType(_ context.Context) attr.Value {
-	return {{ .TypeName }}Value{}
+func (t {{ .TypeName }}Type) ValueType(ctx context.Context) attr.Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: t.{{ .TypeName }}Type.ValueType(ctx).(basetypes.{{ .TypeName }}Value),
+	}
 }

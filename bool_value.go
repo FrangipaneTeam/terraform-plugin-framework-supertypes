@@ -26,8 +26,8 @@ func (v BoolValue) Equal(o attr.Value) bool {
 	return v.BoolValue.Equal(other.BoolValue)
 }
 
-func (v BoolValue) Type(_ context.Context) attr.Type {
-	return BoolType{}
+func (v BoolValue) Type(ctx context.Context) attr.Type {
+	return v.BoolValue.Type(ctx)
 }
 
 func BoolNull() BoolValue {

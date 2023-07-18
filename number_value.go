@@ -28,8 +28,8 @@ func (v NumberValue) Equal(o attr.Value) bool {
 	return v.NumberValue.Equal(other.NumberValue)
 }
 
-func (v NumberValue) Type(_ context.Context) attr.Type {
-	return NumberType{}
+func (v NumberValue) Type(ctx context.Context) attr.Type {
+	return v.NumberValue.Type(ctx)
 }
 
 func NumberNull() NumberValue {
