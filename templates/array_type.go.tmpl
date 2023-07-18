@@ -29,7 +29,7 @@ func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
 }
 
 func (t {{ .TypeName }}Type) String() string {
-	return "types.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
+	return "supertypes.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
 }
 
 func (t {{ .TypeName }}Type) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {

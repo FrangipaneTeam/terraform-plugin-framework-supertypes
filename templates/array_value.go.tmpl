@@ -28,8 +28,9 @@ func (v {{ .TypeName }}Value) Equal(o attr.Value) bool {
 }
 
 func (v {{ .TypeName }}Value) Type(ctx context.Context) attr.Type {
-	// Custom{{ .TypeName }}Type defined in the schema type section
-	return v.{{ .TypeName }}Value.Type(ctx)
+	return {{ .TypeName }}Type{
+		{{ .TypeName }}Type: v.{{ .TypeName }}Value.Type(ctx).(basetypes.{{ .TypeName }}Type),
+	}
 }
 
 func (v {{ .TypeName }}Value) To{{ .TypeName }}Value(_ context.Context) (basetypes.{{ .TypeName }}Value, diag.Diagnostics) {

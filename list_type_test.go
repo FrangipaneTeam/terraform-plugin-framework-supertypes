@@ -330,14 +330,16 @@ func TestListTypeString(t *testing.T) {
 		expected string
 	}{
 		"ElemType-known": {
-			input: ListType{ListType: basetypes.ListType{
-				ElemType: StringType{},
-			}},
-			expected: "types.ListType[basetypes.StringType]",
+			input: ListType{
+				ListType: basetypes.ListType{
+					ElemType: StringType{},
+				},
+			},
+			expected: "supertypes.ListType[supertypes.StringType]",
 		},
 		"ElemType-missing": {
 			input:    ListType{},
-			expected: "types.ListType[!!! MISSING TYPE !!!]",
+			expected: "supertypes.ListType[!!! MISSING TYPE !!!]",
 		},
 	}
 
