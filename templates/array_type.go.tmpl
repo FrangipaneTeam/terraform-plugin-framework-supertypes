@@ -19,13 +19,13 @@ type {{ .TypeName }}Type struct {
 }
 
 func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.{{ .TypeName }}Type)
+	other, ok := o.({{ .TypeName }}Type)
 
 	if !ok {
 		return false
 	}
 
-	return t.{{ .TypeName }}Type.Equal(other)
+	return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
 }
 
 func (t {{ .TypeName }}Type) String() string {

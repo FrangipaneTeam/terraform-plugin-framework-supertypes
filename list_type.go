@@ -21,13 +21,13 @@ type ListType struct {
 }
 
 func (t ListType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.ListType)
+	other, ok := o.(ListType)
 
 	if !ok {
 		return false
 	}
 
-	return t.ListType.Equal(other)
+	return t.ListType.Equal(other.ListType)
 }
 
 func (t ListType) String() string {

@@ -32,15 +32,21 @@ func (v NumberValue) Type(ctx context.Context) attr.Type {
 	return v.NumberValue.Type(ctx)
 }
 
-func NumberNull() NumberValue {
+func NewNumberNull() NumberValue {
 	return NumberValue{
 		NumberValue: basetypes.NewNumberNull(),
 	}
 }
 
-func NumberUnknown() NumberValue {
+func NewNumberUnknown() NumberValue {
 	return NumberValue{
 		NumberValue: basetypes.NewNumberUnknown(),
+	}
+}
+
+func NewNumberValue(s *big.Float) NumberValue {
+	return NumberValue{
+		NumberValue: basetypes.NewNumberValue(s),
 	}
 }
 

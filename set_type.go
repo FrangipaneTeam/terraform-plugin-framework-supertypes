@@ -21,13 +21,13 @@ type SetType struct {
 }
 
 func (t SetType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.SetType)
+	other, ok := o.(SetType)
 
 	if !ok {
 		return false
 	}
 
-	return t.SetType.Equal(other)
+	return t.SetType.Equal(other.SetType)
 }
 
 func (t SetType) String() string {

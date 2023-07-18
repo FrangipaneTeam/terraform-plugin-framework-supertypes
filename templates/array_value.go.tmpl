@@ -36,16 +36,36 @@ func (v {{ .TypeName }}Value) To{{ .TypeName }}Value(_ context.Context) (basetyp
 	return v.{{ .TypeName }}Value, nil
 }
 
-func {{ .TypeName }}Null(elementType attr.Type) {{ .TypeName }}Value {
+func New{{ .TypeName }}Null(elementType attr.Type) {{ .TypeName }}Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(elementType),
 	}
 }
 
-func {{ .TypeName }}Unknown(elementType attr.Type) {{ .TypeName }}Value {
+func New{{ .TypeName }}Unknown(elementType attr.Type) {{ .TypeName }}Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(elementType),
 	}
+}
+
+func New{{ .TypeName }}ValueMust(elementType attr.Type, elements {{ if eq .TypeName "Map"}}map[string]attr.Value{{else}}[]attr.Value{{end}}) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}ValueMust(elementType, elements),
+	}
+}
+
+func New{{ .TypeName }}Value(elementType attr.Type, elements {{ if eq .TypeName "Map"}}map[string]attr.Value{{else}}[]attr.Value{{end}}) ({{ .TypeName }}Value,diag.Diagnostics) {
+	x, d := basetypes.New{{ .TypeName }}Value(elementType, elements)
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: x,
+	},d
+}
+
+func New{{ .TypeName }}ValueFrom(ctx context.Context, elementType attr.Type, elements any) ({{ .TypeName }}Value, diag.Diagnostics) {
+	x, d := basetypes.New{{ .TypeName }}ValueFrom(ctx, elementType, elements)
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: x,
+	}, d
 }
 
 // * CustomFunc

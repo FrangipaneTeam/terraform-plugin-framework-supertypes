@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/fatih/color v1.13.0
+	github.com/google/go-cmp v0.5.9
 	github.com/hashicorp/terraform-plugin-framework v1.3.2
 	github.com/hashicorp/terraform-plugin-go v0.18.0
 	github.com/iancoleman/strcase v0.3.0

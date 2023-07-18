@@ -21,13 +21,13 @@ type MapType struct {
 }
 
 func (t MapType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.MapType)
+	other, ok := o.(MapType)
 
 	if !ok {
 		return false
 	}
 
-	return t.MapType.Equal(other)
+	return t.MapType.Equal(other.MapType)
 }
 
 func (t MapType) String() string {
