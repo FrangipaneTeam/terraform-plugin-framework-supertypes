@@ -30,8 +30,9 @@ func (v SetValue) Equal(o attr.Value) bool {
 }
 
 func (v SetValue) Type(ctx context.Context) attr.Type {
-	// CustomSetType defined in the schema type section
-	return v.SetValue.Type(ctx)
+	return SetType{
+		SetType: v.SetValue.Type(ctx).(basetypes.SetType),
+	}
 }
 
 func (v SetValue) ToSetValue(_ context.Context) (basetypes.SetValue, diag.Diagnostics) {

@@ -27,7 +27,9 @@ func (v Float64Value) Equal(o attr.Value) bool {
 }
 
 func (v Float64Value) Type(ctx context.Context) attr.Type {
-	return v.Float64Value.Type(ctx)
+	return Float64Type{
+		Float64Type: v.Float64Value.Type(ctx).(basetypes.Float64Type),
+	}
 }
 
 func NewFloat64Null() Float64Value {

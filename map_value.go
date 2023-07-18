@@ -30,8 +30,9 @@ func (v MapValue) Equal(o attr.Value) bool {
 }
 
 func (v MapValue) Type(ctx context.Context) attr.Type {
-	// CustomMapType defined in the schema type section
-	return v.MapValue.Type(ctx)
+	return MapType{
+		MapType: v.MapValue.Type(ctx).(basetypes.MapType),
+	}
 }
 
 func (v MapValue) ToMapValue(_ context.Context) (basetypes.MapValue, diag.Diagnostics) {

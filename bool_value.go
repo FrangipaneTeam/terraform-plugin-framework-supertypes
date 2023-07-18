@@ -27,7 +27,9 @@ func (v BoolValue) Equal(o attr.Value) bool {
 }
 
 func (v BoolValue) Type(ctx context.Context) attr.Type {
-	return v.BoolValue.Type(ctx)
+	return BoolType{
+		BoolType: v.BoolValue.Type(ctx).(basetypes.BoolType),
+	}
 }
 
 func NewBoolNull() BoolValue {

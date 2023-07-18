@@ -30,8 +30,9 @@ func (v ListValue) Equal(o attr.Value) bool {
 }
 
 func (v ListValue) Type(ctx context.Context) attr.Type {
-	// CustomListType defined in the schema type section
-	return v.ListValue.Type(ctx)
+	return ListType{
+		ListType: v.ListValue.Type(ctx).(basetypes.ListType),
+	}
 }
 
 func (v ListValue) ToListValue(_ context.Context) (basetypes.ListValue, diag.Diagnostics) {

@@ -29,7 +29,9 @@ func (v NumberValue) Equal(o attr.Value) bool {
 }
 
 func (v NumberValue) Type(ctx context.Context) attr.Type {
-	return v.NumberValue.Type(ctx)
+	return NumberType{
+		NumberType: v.NumberValue.Type(ctx).(basetypes.NumberType),
+	}
 }
 
 func NewNumberNull() NumberValue {

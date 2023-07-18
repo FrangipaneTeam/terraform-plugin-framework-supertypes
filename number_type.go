@@ -30,7 +30,7 @@ func (t NumberType) Equal(o attr.Type) bool {
 }
 
 func (t NumberType) String() string {
-	return "supertypes.NumberType{basetypes.NumberValue{}}"
+	return "supertypes.NumberType"
 }
 
 func (t NumberType) ValueFromNumber(_ context.Context, in basetypes.NumberValue) (basetypes.NumberValuable, diag.Diagnostics) {

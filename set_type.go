@@ -31,7 +31,7 @@ func (t SetType) Equal(o attr.Type) bool {
 }
 
 func (t SetType) String() string {
-	return "types.SetType[" + t.ElementType().String() + "]"
+	return "supertypes.SetType[" + t.ElementType().String() + "]"
 }
 
 func (t SetType) ValueFromSet(_ context.Context, in basetypes.SetValue) (basetypes.SetValuable, diag.Diagnostics) {

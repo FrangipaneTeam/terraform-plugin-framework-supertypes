@@ -30,7 +30,7 @@ func (t BoolType) Equal(o attr.Type) bool {
 }
 
 func (t BoolType) String() string {
-	return "supertypes.BoolType{basetypes.BoolValue{}}"
+	return "supertypes.BoolType"
 }
 
 func (t BoolType) ValueFromBool(_ context.Context, in basetypes.BoolValue) (basetypes.BoolValuable, diag.Diagnostics) {

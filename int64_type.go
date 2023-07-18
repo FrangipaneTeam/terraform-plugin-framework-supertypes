@@ -30,7 +30,7 @@ func (t Int64Type) Equal(o attr.Type) bool {
 }
 
 func (t Int64Type) String() string {
-	return "supertypes.Int64Type{basetypes.Int64Value{}}"
+	return "supertypes.Int64Type"
 }
 
 func (t Int64Type) ValueFromInt64(_ context.Context, in basetypes.Int64Value) (basetypes.Int64Valuable, diag.Diagnostics) {
