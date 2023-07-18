@@ -26,8 +26,8 @@ func (v StringValue) Equal(o attr.Value) bool {
 	return v.StringValue.Equal(other.StringValue)
 }
 
-func (v StringValue) Type(_ context.Context) attr.Type {
-	return StringType{}
+func (v StringValue) Type(ctx context.Context) attr.Type {
+	return v.StringValue.Type(ctx)
 }
 
 func StringNull() StringValue {

@@ -22,7 +22,6 @@ type StringType struct {
 
 func (t StringType) Equal(o attr.Type) bool {
 	other, ok := o.(StringType)
-
 	if !ok {
 		return false
 	}
@@ -31,7 +30,7 @@ func (t StringType) Equal(o attr.Type) bool {
 }
 
 func (t StringType) String() string {
-	return "SuperTypesStringType"
+	return "supertypes.StringType{basetypes.StringValue{}}"
 }
 
 func (t StringType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {
@@ -49,13 +48,11 @@ func (t StringType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 	}
 
 	StringValue, ok := attrValue.(basetypes.StringValue)
-
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
 	StringValuable, diags := t.ValueFromString(ctx, StringValue)
-
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting StringValue to StringValuable: %v", diags)
 	}
@@ -63,6 +60,8 @@ func (t StringType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 	return StringValuable, nil
 }
 
-func (t StringType) ValueType(_ context.Context) attr.Value {
-	return StringValue{}
+func (t StringType) ValueType(ctx context.Context) attr.Value {
+	return StringValue{
+		StringValue: t.StringType.ValueType(ctx).(basetypes.StringValue),
+	}
 }

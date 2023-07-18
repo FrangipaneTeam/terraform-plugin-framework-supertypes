@@ -26,8 +26,8 @@ func (v Int64Value) Equal(o attr.Value) bool {
 	return v.Int64Value.Equal(other.Int64Value)
 }
 
-func (v Int64Value) Type(_ context.Context) attr.Type {
-	return Int64Type{}
+func (v Int64Value) Type(ctx context.Context) attr.Type {
+	return v.Int64Value.Type(ctx)
 }
 
 func Int64Null() Int64Value {

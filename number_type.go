@@ -22,7 +22,6 @@ type NumberType struct {
 
 func (t NumberType) Equal(o attr.Type) bool {
 	other, ok := o.(NumberType)
-
 	if !ok {
 		return false
 	}
@@ -31,7 +30,7 @@ func (t NumberType) Equal(o attr.Type) bool {
 }
 
 func (t NumberType) String() string {
-	return "SuperTypesStringType"
+	return "supertypes.NumberType{basetypes.NumberValue{}}"
 }
 
 func (t NumberType) ValueFromNumber(_ context.Context, in basetypes.NumberValue) (basetypes.NumberValuable, diag.Diagnostics) {
@@ -49,13 +48,11 @@ func (t NumberType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 	}
 
 	NumberValue, ok := attrValue.(basetypes.NumberValue)
-
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
 	NumberValuable, diags := t.ValueFromNumber(ctx, NumberValue)
-
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting NumberValue to NumberValuable: %v", diags)
 	}
@@ -63,6 +60,8 @@ func (t NumberType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 	return NumberValuable, nil
 }
 
-func (t NumberType) ValueType(_ context.Context) attr.Value {
-	return NumberValue{}
+func (t NumberType) ValueType(ctx context.Context) attr.Value {
+	return NumberValue{
+		NumberValue: t.NumberType.ValueType(ctx).(basetypes.NumberValue),
+	}
 }

@@ -22,7 +22,6 @@ type Float64Type struct {
 
 func (t Float64Type) Equal(o attr.Type) bool {
 	other, ok := o.(Float64Type)
-
 	if !ok {
 		return false
 	}
@@ -31,7 +30,7 @@ func (t Float64Type) Equal(o attr.Type) bool {
 }
 
 func (t Float64Type) String() string {
-	return "SuperTypesStringType"
+	return "supertypes.Float64Type{basetypes.Float64Value{}}"
 }
 
 func (t Float64Type) ValueFromFloat64(_ context.Context, in basetypes.Float64Value) (basetypes.Float64Valuable, diag.Diagnostics) {
@@ -49,13 +48,11 @@ func (t Float64Type) ValueFromTerraform(ctx context.Context, in tftypes.Value) (
 	}
 
 	Float64Value, ok := attrValue.(basetypes.Float64Value)
-
 	if !ok {
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
 	Float64Valuable, diags := t.ValueFromFloat64(ctx, Float64Value)
-
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting Float64Value to Float64Valuable: %v", diags)
 	}
@@ -63,6 +60,8 @@ func (t Float64Type) ValueFromTerraform(ctx context.Context, in tftypes.Value) (
 	return Float64Valuable, nil
 }
 
-func (t Float64Type) ValueType(_ context.Context) attr.Value {
-	return Float64Value{}
+func (t Float64Type) ValueType(ctx context.Context) attr.Value {
+	return Float64Value{
+		Float64Value: t.Float64Type.ValueType(ctx).(basetypes.Float64Value),
+	}
 }
