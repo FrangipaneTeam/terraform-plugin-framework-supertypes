@@ -27,13 +27,13 @@ func (v MapNestedValue) ToMapValue(_ context.Context) (basetypes.MapValue, diag.
 	return v.MapValue, nil
 }
 
-func NewMapNestedNull(elementType attr.Type) MapValue {
+func NewMapNestedNull(elementType attr.Type) MapNestedValue {
 	return MapValue{
 		MapValue: basetypes.NewMapNull(elementType),
 	}
 }
 
-func NewMapNestedUnknown(elementType attr.Type) MapValue {
+func NewMapNestedUnknown(elementType attr.Type) MapNestedValue {
 	return MapValue{
 		MapValue: basetypes.NewMapUnknown(elementType),
 	}
