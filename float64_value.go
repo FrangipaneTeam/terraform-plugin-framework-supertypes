@@ -27,18 +27,32 @@ func (v Float64Value) Equal(o attr.Value) bool {
 }
 
 func (v Float64Value) Type(ctx context.Context) attr.Type {
-	return v.Float64Value.Type(ctx)
+	return Float64Type{
+		Float64Type: v.Float64Value.Type(ctx).(basetypes.Float64Type),
+	}
 }
 
-func Float64Null() Float64Value {
+func NewFloat64Null() Float64Value {
 	return Float64Value{
 		Float64Value: basetypes.NewFloat64Null(),
 	}
 }
 
-func Float64Unknown() Float64Value {
+func NewFloat64Unknown() Float64Value {
 	return Float64Value{
 		Float64Value: basetypes.NewFloat64Unknown(),
+	}
+}
+
+func NewFloat64Value(s float64) Float64Value {
+	return Float64Value{
+		Float64Value: basetypes.NewFloat64Value(s),
+	}
+}
+
+func NewFloat64PointerValue(s *float64) Float64Value {
+	return Float64Value{
+		Float64Value: basetypes.NewFloat64PointerValue(s),
 	}
 }
 
@@ -46,6 +60,10 @@ func Float64Unknown() Float64Value {
 
 func (v *Float64Value) Get() float64 {
 	return v.Float64Value.ValueFloat64()
+}
+
+func (v *Float64Value) GetPtr() *float64 {
+	return v.Float64Value.ValueFloat64Pointer()
 }
 
 func (v Float64Value) Set(s float64) {

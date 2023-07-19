@@ -21,17 +21,17 @@ type ListType struct {
 }
 
 func (t ListType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.ListType)
+	other, ok := o.(ListType)
 
 	if !ok {
 		return false
 	}
 
-	return t.ListType.Equal(other)
+	return t.ListType.Equal(other.ListType)
 }
 
 func (t ListType) String() string {
-	return "types.ListType[" + t.ElementType().String() + "]"
+	return "supertypes.ListType[" + t.ElementType().String() + "]"
 }
 
 func (t ListType) ValueFromList(_ context.Context, in basetypes.ListValue) (basetypes.ListValuable, diag.Diagnostics) {

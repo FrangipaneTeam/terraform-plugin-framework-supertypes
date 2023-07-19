@@ -21,17 +21,17 @@ type MapType struct {
 }
 
 func (t MapType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.MapType)
+	other, ok := o.(MapType)
 
 	if !ok {
 		return false
 	}
 
-	return t.MapType.Equal(other)
+	return t.MapType.Equal(other.MapType)
 }
 
 func (t MapType) String() string {
-	return "types.MapType[" + t.ElementType().String() + "]"
+	return "supertypes.MapType[" + t.ElementType().String() + "]"
 }
 
 func (t MapType) ValueFromMap(_ context.Context, in basetypes.MapValue) (basetypes.MapValuable, diag.Diagnostics) {

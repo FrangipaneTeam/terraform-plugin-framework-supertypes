@@ -33,7 +33,7 @@ func (t missingType) Equal(o attr.Type) bool {
 
 // String returns a human readable string of the type.
 func (t missingType) String() string {
-	return "!!! MISSING TYPE !!! PROUT"
+	return "!!! MISSING TYPE !!!"
 }
 
 // TerraformType returns DynamicPseudoType.

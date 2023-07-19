@@ -27,18 +27,32 @@ func (v BoolValue) Equal(o attr.Value) bool {
 }
 
 func (v BoolValue) Type(ctx context.Context) attr.Type {
-	return v.BoolValue.Type(ctx)
+	return BoolType{
+		BoolType: v.BoolValue.Type(ctx).(basetypes.BoolType),
+	}
 }
 
-func BoolNull() BoolValue {
+func NewBoolNull() BoolValue {
 	return BoolValue{
 		BoolValue: basetypes.NewBoolNull(),
 	}
 }
 
-func BoolUnknown() BoolValue {
+func NewBoolUnknown() BoolValue {
 	return BoolValue{
 		BoolValue: basetypes.NewBoolUnknown(),
+	}
+}
+
+func NewBoolValue(s bool) BoolValue {
+	return BoolValue{
+		BoolValue: basetypes.NewBoolValue(s),
+	}
+}
+
+func NewBoolPointerValue(s *bool) BoolValue {
+	return BoolValue{
+		BoolValue: basetypes.NewBoolPointerValue(s),
 	}
 }
 
@@ -46,6 +60,10 @@ func BoolUnknown() BoolValue {
 
 func (v *BoolValue) Get() bool {
 	return v.BoolValue.ValueBool()
+}
+
+func (v *BoolValue) GetPtr() *bool {
+	return v.BoolValue.ValueBoolPointer()
 }
 
 func (v BoolValue) Set(s bool) {

@@ -30,24 +30,45 @@ func (v ListValue) Equal(o attr.Value) bool {
 }
 
 func (v ListValue) Type(ctx context.Context) attr.Type {
-	// CustomListType defined in the schema type section
-	return v.ListValue.Type(ctx)
+	return ListType{
+		ListType: v.ListValue.Type(ctx).(basetypes.ListType),
+	}
 }
 
 func (v ListValue) ToListValue(_ context.Context) (basetypes.ListValue, diag.Diagnostics) {
 	return v.ListValue, nil
 }
 
-func ListNull(elementType attr.Type) ListValue {
+func NewListNull(elementType attr.Type) ListValue {
 	return ListValue{
 		ListValue: basetypes.NewListNull(elementType),
 	}
 }
 
-func ListUnknown(elementType attr.Type) ListValue {
+func NewListUnknown(elementType attr.Type) ListValue {
 	return ListValue{
 		ListValue: basetypes.NewListUnknown(elementType),
 	}
+}
+
+func NewListValueMust(elementType attr.Type, elements []attr.Value) ListValue {
+	return ListValue{
+		ListValue: basetypes.NewListValueMust(elementType, elements),
+	}
+}
+
+func NewListValue(elementType attr.Type, elements []attr.Value) (ListValue, diag.Diagnostics) {
+	x, d := basetypes.NewListValue(elementType, elements)
+	return ListValue{
+		ListValue: x,
+	}, d
+}
+
+func NewListValueFrom(ctx context.Context, elementType attr.Type, elements any) (ListValue, diag.Diagnostics) {
+	x, d := basetypes.NewListValueFrom(ctx, elementType, elements)
+	return ListValue{
+		ListValue: x,
+	}, d
 }
 
 // * CustomFunc

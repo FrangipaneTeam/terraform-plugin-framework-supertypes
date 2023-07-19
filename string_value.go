@@ -27,18 +27,32 @@ func (v StringValue) Equal(o attr.Value) bool {
 }
 
 func (v StringValue) Type(ctx context.Context) attr.Type {
-	return v.StringValue.Type(ctx)
+	return StringType{
+		StringType: v.StringValue.Type(ctx).(basetypes.StringType),
+	}
 }
 
-func StringNull() StringValue {
+func NewStringNull() StringValue {
 	return StringValue{
 		StringValue: basetypes.NewStringNull(),
 	}
 }
 
-func StringUnknown() StringValue {
+func NewStringUnknown() StringValue {
 	return StringValue{
 		StringValue: basetypes.NewStringUnknown(),
+	}
+}
+
+func NewStringValue(s string) StringValue {
+	return StringValue{
+		StringValue: basetypes.NewStringValue(s),
+	}
+}
+
+func NewStringPointerValue(s *string) StringValue {
+	return StringValue{
+		StringValue: basetypes.NewStringPointerValue(s),
 	}
 }
 
@@ -46,6 +60,10 @@ func StringUnknown() StringValue {
 
 func (v *StringValue) Get() string {
 	return v.StringValue.ValueString()
+}
+
+func (v *StringValue) GetPtr() *string {
+	return v.StringValue.ValueStringPointer()
 }
 
 func (v StringValue) Set(s string) {

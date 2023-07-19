@@ -21,17 +21,17 @@ type SetType struct {
 }
 
 func (t SetType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.SetType)
+	other, ok := o.(SetType)
 
 	if !ok {
 		return false
 	}
 
-	return t.SetType.Equal(other)
+	return t.SetType.Equal(other.SetType)
 }
 
 func (t SetType) String() string {
-	return "types.SetType[" + t.ElementType().String() + "]"
+	return "supertypes.SetType[" + t.ElementType().String() + "]"
 }
 
 func (t SetType) ValueFromSet(_ context.Context, in basetypes.SetValue) (basetypes.SetValuable, diag.Diagnostics) {

@@ -28,28 +28,50 @@ func (v {{ .TypeName }}Value) Equal(o attr.Value) bool {
 }
 
 func (v {{ .TypeName }}Value) Type(ctx context.Context) attr.Type {
-	return v.{{ .TypeName }}Value.Type(ctx)
+	return {{ .TypeName }}Type{
+		{{ .TypeName }}Type: v.{{ .TypeName }}Value.Type(ctx).(basetypes.{{ .TypeName }}Type),
+	}
 }
 
-func {{ .TypeName }}Null() {{ .TypeName }}Value {
+func New{{ .TypeName }}Null() {{ .TypeName }}Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(),
 	}
 }
 
-func {{ .TypeName }}Unknown() {{ .TypeName }}Value {
+func New{{ .TypeName }}Unknown() {{ .TypeName }}Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(),
 	}
 }
 
+func New{{ .TypeName }}Value(s {{ golangType .TypeName }}) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Value(s),
+	}
+}
+
+{{ if ne .TypeName "Number" }}
+func New{{ .TypeName }}PointerValue(s *{{ golangType .TypeName }}) {{ .TypeName }}Value {
+	return {{ .TypeName }}Value{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}PointerValue(s),
+	}
+}
+{{ end }}
+
 // * CustomFunc
 
-func (v *{{ .TypeName }}Value) Get() {{ if eq .TypeName "String" }}string{{ else if eq .TypeName "Int64" }}int64{{ else if eq .TypeName "Float64" }}float64{{ else if eq .TypeName "Bool" }}bool{{ else if eq .TypeName "Number"}}*big.Float{{ end }} {
+func (v *{{ .TypeName }}Value) Get() {{ golangType .TypeName }} {
 	return v.{{ .TypeName }}Value.Value{{  if eq .TypeName "Number"}}BigFloat{{else}}{{ .TypeName }}{{end}}()
 }
 
-func (v {{ .TypeName }}Value) Set(s {{ if eq .TypeName "String" }}string{{ else if eq .TypeName "Int64" }}int64{{ else if eq .TypeName "Float64" }}float64{{ else if eq .TypeName "Bool" }}bool{{ else if eq .TypeName "Number"}}*big.Float{{ end }}) {
+{{ if ne .TypeName "Number" }}
+func (v *{{ .TypeName }}Value) GetPtr() *{{ golangType .TypeName }} {
+	return v.{{ .TypeName }}Value.Value{{ .TypeName }}Pointer()
+}
+{{ end }}
+
+func (v {{ .TypeName }}Value) Set(s {{ golangType .TypeName }}) {
 	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Value(s)
 }
 

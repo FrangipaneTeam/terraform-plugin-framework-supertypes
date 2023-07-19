@@ -30,7 +30,7 @@ func (t StringType) Equal(o attr.Type) bool {
 }
 
 func (t StringType) String() string {
-	return "supertypes.StringType{basetypes.StringValue{}}"
+	return "supertypes.StringType"
 }
 
 func (t StringType) ValueFromString(_ context.Context, in basetypes.StringValue) (basetypes.StringValuable, diag.Diagnostics) {

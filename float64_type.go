@@ -30,7 +30,7 @@ func (t Float64Type) Equal(o attr.Type) bool {
 }
 
 func (t Float64Type) String() string {
-	return "supertypes.Float64Type{basetypes.Float64Value{}}"
+	return "supertypes.Float64Type"
 }
 
 func (t Float64Type) ValueFromFloat64(_ context.Context, in basetypes.Float64Value) (basetypes.Float64Valuable, diag.Diagnostics) {

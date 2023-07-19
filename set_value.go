@@ -30,24 +30,45 @@ func (v SetValue) Equal(o attr.Value) bool {
 }
 
 func (v SetValue) Type(ctx context.Context) attr.Type {
-	// CustomSetType defined in the schema type section
-	return v.SetValue.Type(ctx)
+	return SetType{
+		SetType: v.SetValue.Type(ctx).(basetypes.SetType),
+	}
 }
 
 func (v SetValue) ToSetValue(_ context.Context) (basetypes.SetValue, diag.Diagnostics) {
 	return v.SetValue, nil
 }
 
-func SetNull(elementType attr.Type) SetValue {
+func NewSetNull(elementType attr.Type) SetValue {
 	return SetValue{
 		SetValue: basetypes.NewSetNull(elementType),
 	}
 }
 
-func SetUnknown(elementType attr.Type) SetValue {
+func NewSetUnknown(elementType attr.Type) SetValue {
 	return SetValue{
 		SetValue: basetypes.NewSetUnknown(elementType),
 	}
+}
+
+func NewSetValueMust(elementType attr.Type, elements []attr.Value) SetValue {
+	return SetValue{
+		SetValue: basetypes.NewSetValueMust(elementType, elements),
+	}
+}
+
+func NewSetValue(elementType attr.Type, elements []attr.Value) (SetValue, diag.Diagnostics) {
+	x, d := basetypes.NewSetValue(elementType, elements)
+	return SetValue{
+		SetValue: x,
+	}, d
+}
+
+func NewSetValueFrom(ctx context.Context, elementType attr.Type, elements any) (SetValue, diag.Diagnostics) {
+	x, d := basetypes.NewSetValueFrom(ctx, elementType, elements)
+	return SetValue{
+		SetValue: x,
+	}, d
 }
 
 // * CustomFunc

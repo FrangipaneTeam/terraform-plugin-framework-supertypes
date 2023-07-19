@@ -30,24 +30,45 @@ func (v MapValue) Equal(o attr.Value) bool {
 }
 
 func (v MapValue) Type(ctx context.Context) attr.Type {
-	// CustomMapType defined in the schema type section
-	return v.MapValue.Type(ctx)
+	return MapType{
+		MapType: v.MapValue.Type(ctx).(basetypes.MapType),
+	}
 }
 
 func (v MapValue) ToMapValue(_ context.Context) (basetypes.MapValue, diag.Diagnostics) {
 	return v.MapValue, nil
 }
 
-func MapNull(elementType attr.Type) MapValue {
+func NewMapNull(elementType attr.Type) MapValue {
 	return MapValue{
 		MapValue: basetypes.NewMapNull(elementType),
 	}
 }
 
-func MapUnknown(elementType attr.Type) MapValue {
+func NewMapUnknown(elementType attr.Type) MapValue {
 	return MapValue{
 		MapValue: basetypes.NewMapUnknown(elementType),
 	}
+}
+
+func NewMapValueMust(elementType attr.Type, elements map[string]attr.Value) MapValue {
+	return MapValue{
+		MapValue: basetypes.NewMapValueMust(elementType, elements),
+	}
+}
+
+func NewMapValue(elementType attr.Type, elements map[string]attr.Value) (MapValue, diag.Diagnostics) {
+	x, d := basetypes.NewMapValue(elementType, elements)
+	return MapValue{
+		MapValue: x,
+	}, d
+}
+
+func NewMapValueFrom(ctx context.Context, elementType attr.Type, elements any) (MapValue, diag.Diagnostics) {
+	x, d := basetypes.NewMapValueFrom(ctx, elementType, elements)
+	return MapValue{
+		MapValue: x,
+	}, d
 }
 
 // * CustomFunc
