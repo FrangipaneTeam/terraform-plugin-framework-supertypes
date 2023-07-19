@@ -25,13 +25,13 @@ func (v {{ .TypeName }}NestedValue) To{{ .TypeName }}Value(_ context.Context) (b
 	return v.{{ .TypeName }}Value, nil
 }
 
-func New{{ .TypeName }}NestedNull(elementType attr.Type) {{ .TypeName }}Value {
+func New{{ .TypeName }}NestedNull(elementType attr.Type) {{ .TypeName }}NestedValue {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(elementType),
 	}
 }
 
-func New{{ .TypeName }}NestedUnknown(elementType attr.Type) {{ .TypeName }}Value {
+func New{{ .TypeName }}NestedUnknown(elementType attr.Type) {{ .TypeName }}NestedValue {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(elementType),
 	}

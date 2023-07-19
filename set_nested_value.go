@@ -27,13 +27,13 @@ func (v SetNestedValue) ToSetValue(_ context.Context) (basetypes.SetValue, diag.
 	return v.SetValue, nil
 }
 
-func NewSetNestedNull(elementType attr.Type) SetValue {
+func NewSetNestedNull(elementType attr.Type) SetNestedValue {
 	return SetValue{
 		SetValue: basetypes.NewSetNull(elementType),
 	}
 }
 
-func NewSetNestedUnknown(elementType attr.Type) SetValue {
+func NewSetNestedUnknown(elementType attr.Type) SetNestedValue {
 	return SetValue{
 		SetValue: basetypes.NewSetUnknown(elementType),
 	}

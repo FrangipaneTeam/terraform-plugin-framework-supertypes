@@ -27,13 +27,13 @@ func (v ListNestedValue) ToListValue(_ context.Context) (basetypes.ListValue, di
 	return v.ListValue, nil
 }
 
-func NewListNestedNull(elementType attr.Type) ListValue {
+func NewListNestedNull(elementType attr.Type) ListNestedValue {
 	return ListValue{
 		ListValue: basetypes.NewListNull(elementType),
 	}
 }
 
-func NewListNestedUnknown(elementType attr.Type) ListValue {
+func NewListNestedUnknown(elementType attr.Type) ListNestedValue {
 	return ListValue{
 		ListValue: basetypes.NewListUnknown(elementType),
 	}
