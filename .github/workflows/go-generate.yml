@@ -7,12 +7,7 @@ on:
     paths:
       - '.github/workflows/go-generate.yml'
       - 'template.go'
-      - 'templates/array_type.go.tmpl'
-      - 'templates/array_value.go.tmpl'
-      - 'templates/nested_type.go.tmpl'
-      - 'templates/nested_value.go.tmpl'
-      - 'templates/simple_type.go.tmpl'
-      - 'templates/simple_value.go.tmpl'
+      - 'templates/*.go.tmpl'
 name: go-generate
 jobs:
   go-generate:

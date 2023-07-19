@@ -30,13 +30,13 @@ func (v {{ .TypeName }}Value) Type(_ context.Context) attr.Type {
 	return {{ .TypeName }}Type{}
 }
 
-func {{ .TypeName }}Null(attributeTypes map[string]attr.Type) {{ .TypeName }}Value {
+func New{{ .TypeName }}Null(attributeTypes map[string]attr.Type) {{ .TypeName }}Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(attributeTypes),
 	}
 }
 
-func {{ .TypeName }}Unknown(attributeTypes map[string]attr.Type) {{ .TypeName }}Value {
+func New{{ .TypeName }}Unknown(attributeTypes map[string]attr.Type) {{ .TypeName }}Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(attributeTypes),
 	}
