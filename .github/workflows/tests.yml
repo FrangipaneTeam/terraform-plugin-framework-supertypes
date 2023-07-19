@@ -5,6 +5,7 @@ name: Tests
 # Optionally, you can turn it on using a schedule for regular testing.
 on:
   workflow_call:
+    secrets:
       token:
         required: true
   pull_request:

@@ -23,6 +23,8 @@ jobs:
           commit_message: 'ci(generate): changes by go generate'
           file_pattern: '*_type.go *_value.go'
           skip_dirty_check: true
-      - uses: ./.github/workflows/tests.yml
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+  call-workflow-tests:
+    needs: go-generate
+    uses: ./.github/workflows/tests.yml
+    secrets:
+      token: ${{ secrets.GITHUB_TOKEN }}
