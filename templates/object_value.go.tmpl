@@ -48,17 +48,17 @@ func (v *{{ .TypeName }}Value) Get(ctx context.Context, target interface{}, opts
 	return v.{{ .TypeName }}Value.As(ctx, target, opts)
 }
 
-func (v {{ .TypeName }}Value) Set(ctx context.Context, structure any) diag.Diagnostics {
+func (v *{{ .TypeName }}Value) Set(ctx context.Context, structure any) diag.Diagnostics {
 	var d diag.Diagnostics
 	v.{{ .TypeName }}Value, d = basetypes.New{{ .TypeName }}ValueFrom(ctx, v.AttributeTypes(ctx), structure)
 	return d
 }
 
-func (v {{ .TypeName }}Value) SetNull(ctx context.Context) {
+func (v *{{ .TypeName }}Value) SetNull(ctx context.Context) {
 	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Null(v.AttributeTypes(ctx))
 }
 
-func (v {{ .TypeName }}Value) SetUnknown(ctx context.Context) {
+func (v *{{ .TypeName }}Value) SetUnknown(ctx context.Context) {
 	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Unknown(v.AttributeTypes(ctx))
 }
 

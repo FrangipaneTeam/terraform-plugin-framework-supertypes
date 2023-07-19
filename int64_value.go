@@ -66,15 +66,15 @@ func (v *Int64Value) GetPtr() *int64 {
 	return v.Int64Value.ValueInt64Pointer()
 }
 
-func (v Int64Value) Set(s int64) {
+func (v *Int64Value) Set(s int64) {
 	v.Int64Value = basetypes.NewInt64Value(s)
 }
 
-func (v Int64Value) SetNull() {
+func (v *Int64Value) SetNull() {
 	v.Int64Value = basetypes.NewInt64Null()
 }
 
-func (v Int64Value) SetUnknown() {
+func (v *Int64Value) SetUnknown() {
 	v.Int64Value = basetypes.NewInt64Unknown()
 }
 
