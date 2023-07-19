@@ -24,6 +24,7 @@ jobs:
           file_pattern: '*_type.go *_value.go'
           skip_dirty_check: true
   call-workflow-tests:
+    needs: go-generate
     uses: ./.github/workflows/tests.yml
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
