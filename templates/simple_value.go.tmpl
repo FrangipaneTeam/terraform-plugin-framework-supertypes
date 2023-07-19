@@ -71,15 +71,15 @@ func (v *{{ .TypeName }}Value) GetPtr() *{{ golangType .TypeName }} {
 }
 {{ end }}
 
-func (v {{ .TypeName }}Value) Set(s {{ golangType .TypeName }}) {
+func (v *{{ .TypeName }}Value) Set(s {{ golangType .TypeName }}) {
 	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Value(s)
 }
 
-func (v {{ .TypeName }}Value) SetNull() {
+func (v *{{ .TypeName }}Value) SetNull() {
 	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Null()
 }
 
-func (v {{ .TypeName }}Value) SetUnknown() {
+func (v *{{ .TypeName }}Value) SetUnknown() {
 	v.{{ .TypeName }}Value = basetypes.New{{ .TypeName }}Unknown()
 }
 

@@ -58,18 +58,18 @@ func (v *NumberValue) Get() *big.Float {
 	return v.NumberValue.ValueBigFloat()
 }
 
-func (v NumberValue) Set(s *big.Float) {
+func (v *NumberValue) Set(s *big.Float) {
 	v.NumberValue = basetypes.NewNumberValue(s)
 }
 
-func (v NumberValue) SetNull() {
+func (v *NumberValue) SetNull() {
 	v.NumberValue = basetypes.NewNumberNull()
 }
 
-func (v NumberValue) SetUnknown() {
+func (v *NumberValue) SetUnknown() {
 	v.NumberValue = basetypes.NewNumberUnknown()
 }
 
-func (v NumberValue) IsKnown() bool {
+func (v *NumberValue) IsKnown() bool {
 	return !v.NumberValue.IsNull() && !v.NumberValue.IsUnknown()
 }

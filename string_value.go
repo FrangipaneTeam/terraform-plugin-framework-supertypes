@@ -66,18 +66,18 @@ func (v *StringValue) GetPtr() *string {
 	return v.StringValue.ValueStringPointer()
 }
 
-func (v StringValue) Set(s string) {
+func (v *StringValue) Set(s string) {
 	v.StringValue = basetypes.NewStringValue(s)
 }
 
-func (v StringValue) SetNull() {
+func (v *StringValue) SetNull() {
 	v.StringValue = basetypes.NewStringNull()
 }
 
-func (v StringValue) SetUnknown() {
+func (v *StringValue) SetUnknown() {
 	v.StringValue = basetypes.NewStringUnknown()
 }
 
-func (v StringValue) IsKnown() bool {
+func (v *StringValue) IsKnown() bool {
 	return !v.StringValue.IsNull() && !v.StringValue.IsUnknown()
 }

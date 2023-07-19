@@ -149,12 +149,6 @@ var templateSimpleType string
 //go:embed templates/simple_value.go.tmpl
 var templateSimpleValue string
 
-//go:embed templates/simple_type_test.go.tmpl
-var templateSimpleTypeTest string
-
-//go:embed templates/simple_value_test.go.tmpl
-var templateSimpleValueTest string
-
 // * Array
 //
 //go:embed templates/array_type.go.tmpl

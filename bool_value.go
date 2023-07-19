@@ -66,18 +66,18 @@ func (v *BoolValue) GetPtr() *bool {
 	return v.BoolValue.ValueBoolPointer()
 }
 
-func (v BoolValue) Set(s bool) {
+func (v *BoolValue) Set(s bool) {
 	v.BoolValue = basetypes.NewBoolValue(s)
 }
 
-func (v BoolValue) SetNull() {
+func (v *BoolValue) SetNull() {
 	v.BoolValue = basetypes.NewBoolNull()
 }
 
-func (v BoolValue) SetUnknown() {
+func (v *BoolValue) SetUnknown() {
 	v.BoolValue = basetypes.NewBoolUnknown()
 }
 
-func (v BoolValue) IsKnown() bool {
+func (v *BoolValue) IsKnown() bool {
 	return !v.BoolValue.IsNull() && !v.BoolValue.IsUnknown()
 }

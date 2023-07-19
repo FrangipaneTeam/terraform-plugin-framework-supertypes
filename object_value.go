@@ -50,17 +50,17 @@ func (v *ObjectValue) Get(ctx context.Context, target interface{}, opts basetype
 	return v.ObjectValue.As(ctx, target, opts)
 }
 
-func (v ObjectValue) Set(ctx context.Context, structure any) diag.Diagnostics {
+func (v *ObjectValue) Set(ctx context.Context, structure any) diag.Diagnostics {
 	var d diag.Diagnostics
 	v.ObjectValue, d = basetypes.NewObjectValueFrom(ctx, v.AttributeTypes(ctx), structure)
 	return d
 }
 
-func (v ObjectValue) SetNull(ctx context.Context) {
+func (v *ObjectValue) SetNull(ctx context.Context) {
 	v.ObjectValue = basetypes.NewObjectNull(v.AttributeTypes(ctx))
 }
 
-func (v ObjectValue) SetUnknown(ctx context.Context) {
+func (v *ObjectValue) SetUnknown(ctx context.Context) {
 	v.ObjectValue = basetypes.NewObjectUnknown(v.AttributeTypes(ctx))
 }
 
