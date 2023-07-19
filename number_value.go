@@ -70,6 +70,6 @@ func (v *NumberValue) SetUnknown() {
 	v.NumberValue = basetypes.NewNumberUnknown()
 }
 
-func (v *NumberValue) IsKnown() bool {
+func (v NumberValue) IsKnown() bool {
 	return !v.NumberValue.IsNull() && !v.NumberValue.IsUnknown()
 }

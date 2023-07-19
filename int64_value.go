@@ -78,6 +78,6 @@ func (v *Int64Value) SetUnknown() {
 	v.Int64Value = basetypes.NewInt64Unknown()
 }
 
-func (v *Int64Value) IsKnown() bool {
+func (v Int64Value) IsKnown() bool {
 	return !v.Int64Value.IsNull() && !v.Int64Value.IsUnknown()
 }

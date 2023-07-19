@@ -78,6 +78,6 @@ func (v *StringValue) SetUnknown() {
 	v.StringValue = basetypes.NewStringUnknown()
 }
 
-func (v *StringValue) IsKnown() bool {
+func (v StringValue) IsKnown() bool {
 	return !v.StringValue.IsNull() && !v.StringValue.IsUnknown()
 }

@@ -78,6 +78,6 @@ func (v *Float64Value) SetUnknown() {
 	v.Float64Value = basetypes.NewFloat64Unknown()
 }
 
-func (v *Float64Value) IsKnown() bool {
+func (v Float64Value) IsKnown() bool {
 	return !v.Float64Value.IsNull() && !v.Float64Value.IsUnknown()
 }

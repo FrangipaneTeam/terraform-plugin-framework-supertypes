@@ -78,6 +78,6 @@ func (v *BoolValue) SetUnknown() {
 	v.BoolValue = basetypes.NewBoolUnknown()
 }
 
-func (v *BoolValue) IsKnown() bool {
+func (v BoolValue) IsKnown() bool {
 	return !v.BoolValue.IsNull() && !v.BoolValue.IsUnknown()
 }
