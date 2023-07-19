@@ -32,13 +32,13 @@ func (v ObjectValue) Type(_ context.Context) attr.Type {
 	return ObjectType{}
 }
 
-func ObjectNull(attributeTypes map[string]attr.Type) ObjectValue {
+func NewObjectNull(attributeTypes map[string]attr.Type) ObjectValue {
 	return ObjectValue{
 		ObjectValue: basetypes.NewObjectNull(attributeTypes),
 	}
 }
 
-func ObjectUnknown(attributeTypes map[string]attr.Type) ObjectValue {
+func NewObjectUnknown(attributeTypes map[string]attr.Type) ObjectValue {
 	return ObjectValue{
 		ObjectValue: basetypes.NewObjectUnknown(attributeTypes),
 	}

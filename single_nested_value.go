@@ -27,14 +27,14 @@ func (v SingleNestedValue) ToObjectValue(_ context.Context) (basetypes.ObjectVal
 	return v.ObjectValue, nil
 }
 
-func SingleNestedNull(attributeTypes map[string]attr.Type) ObjectValue {
-	return ObjectValue{
+func NewSingleNestedNull(attributeTypes map[string]attr.Type) SingleNestedValue {
+	return SingleNestedValue{
 		ObjectValue: basetypes.NewObjectNull(attributeTypes),
 	}
 }
 
-func SingleNestedUnknown(attributeTypes map[string]attr.Type) ObjectValue {
-	return ObjectValue{
+func NewSingleNestedUnknown(attributeTypes map[string]attr.Type) SingleNestedValue {
+	return SingleNestedValue{
 		ObjectValue: basetypes.NewObjectUnknown(attributeTypes),
 	}
 }
