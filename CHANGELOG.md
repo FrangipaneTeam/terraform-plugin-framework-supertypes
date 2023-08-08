@@ -3,6 +3,7 @@
 ### :dependabot: **Dependencies**
 
 * deps: bumps github.com/hashicorp/terraform-plugin-framework from 1.3.2 to 1.3.3 ([GH-21](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/21))
+* deps: bumps github.com/hashicorp/terraform-plugin-framework from 1.3.3 to 1.3.4 ([GH-24](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/24))
 
 ## 0.0.5 (July 19, 2023)
 
