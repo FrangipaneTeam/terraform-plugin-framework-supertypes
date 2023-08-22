@@ -67,7 +67,17 @@ func (v *Float64Value) GetPtr() *float64 {
 }
 
 func (v *Float64Value) Set(s float64) {
+
 	v.Float64Value = basetypes.NewFloat64Value(s)
+}
+
+func (v *Float64Value) SetPtr(s *float64) {
+	if s == nil {
+		v.Float64Value = basetypes.NewFloat64Null()
+		return
+	}
+
+	v.Float64Value = basetypes.NewFloat64PointerValue(s)
 }
 
 func (v *Float64Value) SetNull() {

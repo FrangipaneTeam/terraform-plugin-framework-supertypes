@@ -67,7 +67,22 @@ func (v *StringValue) GetPtr() *string {
 }
 
 func (v *StringValue) Set(s string) {
+
+	if s == "" {
+		v.StringValue = basetypes.NewStringNull()
+		return
+	}
+
 	v.StringValue = basetypes.NewStringValue(s)
+}
+
+func (v *StringValue) SetPtr(s *string) {
+	if s == nil {
+		v.StringValue = basetypes.NewStringNull()
+		return
+	}
+
+	v.StringValue = basetypes.NewStringPointerValue(s)
 }
 
 func (v *StringValue) SetNull() {

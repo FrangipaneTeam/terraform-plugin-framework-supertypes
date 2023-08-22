@@ -67,7 +67,17 @@ func (v *BoolValue) GetPtr() *bool {
 }
 
 func (v *BoolValue) Set(s bool) {
+
 	v.BoolValue = basetypes.NewBoolValue(s)
+}
+
+func (v *BoolValue) SetPtr(s *bool) {
+	if s == nil {
+		v.BoolValue = basetypes.NewBoolNull()
+		return
+	}
+
+	v.BoolValue = basetypes.NewBoolPointerValue(s)
 }
 
 func (v *BoolValue) SetNull() {

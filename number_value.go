@@ -59,7 +59,17 @@ func (v *NumberValue) Get() *big.Float {
 }
 
 func (v *NumberValue) Set(s *big.Float) {
+
 	v.NumberValue = basetypes.NewNumberValue(s)
+}
+
+func (v *NumberValue) SetPtr(s **big.Float) {
+	if s == nil {
+		v.NumberValue = basetypes.NewNumberNull()
+		return
+	}
+
+	v.NumberValue = basetypes.NewNumberPointerValue(s)
 }
 
 func (v *NumberValue) SetNull() {
