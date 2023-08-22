@@ -54,32 +54,28 @@ func NewNumberValue(s *big.Float) NumberValue {
 
 // * CustomFunc
 
+// Get returns the known Number value. If Number is null or unknown, returns 0.0.
 func (v *NumberValue) Get() *big.Float {
 	return v.NumberValue.ValueBigFloat()
 }
 
+// Set sets the Number value.
 func (v *NumberValue) Set(s *big.Float) {
 
 	v.NumberValue = basetypes.NewNumberValue(s)
 }
 
-func (v *NumberValue) SetPtr(s **big.Float) {
-	if s == nil {
-		v.NumberValue = basetypes.NewNumberNull()
-		return
-	}
-
-	v.NumberValue = basetypes.NewNumberPointerValue(s)
-}
-
+// SetNull sets the Number value to null.
 func (v *NumberValue) SetNull() {
 	v.NumberValue = basetypes.NewNumberNull()
 }
 
+// SetUnknown sets the Number value to unknown.
 func (v *NumberValue) SetUnknown() {
 	v.NumberValue = basetypes.NewNumberUnknown()
 }
 
+// IsKnown returns true if the value is not null and not unknown.
 func (v NumberValue) IsKnown() bool {
 	return !v.NumberValue.IsNull() && !v.NumberValue.IsUnknown()
 }

@@ -58,14 +58,18 @@ func NewStringPointerValue(s *string) StringValue {
 
 // * CustomFunc
 
+// Get returns the known String value. If String is null or unknown, returns "".
 func (v *StringValue) Get() string {
 	return v.StringValue.ValueString()
 }
 
+// GetPtr returns a pointer to the known int64 value, nil for a
+// null value, or a pointer to 0 for an unknown value.
 func (v *StringValue) GetPtr() *string {
 	return v.StringValue.ValueStringPointer()
 }
 
+// Set sets the String value.
 func (v *StringValue) Set(s string) {
 
 	if s == "" {
@@ -76,6 +80,7 @@ func (v *StringValue) Set(s string) {
 	v.StringValue = basetypes.NewStringValue(s)
 }
 
+// SetPtr sets a pointer to the String value.
 func (v *StringValue) SetPtr(s *string) {
 	if s == nil {
 		v.StringValue = basetypes.NewStringNull()
@@ -85,14 +90,17 @@ func (v *StringValue) SetPtr(s *string) {
 	v.StringValue = basetypes.NewStringPointerValue(s)
 }
 
+// SetNull sets the String value to null.
 func (v *StringValue) SetNull() {
 	v.StringValue = basetypes.NewStringNull()
 }
 
+// SetUnknown sets the String value to unknown.
 func (v *StringValue) SetUnknown() {
 	v.StringValue = basetypes.NewStringUnknown()
 }
 
+// IsKnown returns true if the value is not null and not unknown.
 func (v StringValue) IsKnown() bool {
 	return !v.StringValue.IsNull() && !v.StringValue.IsUnknown()
 }

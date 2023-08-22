@@ -1,0 +1,18 @@
+```release-note:feature
+`attribute/int64` - Add funcs `SetPtr`, `SetInt`, `SetInt8`, `SetInt16`, `SetInt32`, `SetInt64`, `SetIntPtr`, `SetInt8Ptr`, `SetInt16Ptr`, `SetInt32Ptr`, `SetInt64Ptr`, `GetInt`, `GetInt8`, `GetInt16`, `GetInt32`, `GetInt64`, `GetIntPtr`, `GetInt8Ptr`, `GetInt16Ptr`, `GetInt32Ptr`, `GetInt64Ptr`
+```
+
+```release-note:feature
+`attribute/float64` - Add func `SetFloat32`, `SetFloat64`, `SetFloat32Ptr`, `SetFloat64Ptr`, `GetFloat32`, `GetFloat64`, `GetFloat32Ptr`, `GetFloat64Ptr`
+```
+
+```release-note:feature
+`attribute/string` - Add func `SetPtr`
+```
+```release-note:breaking-change
+`attribute/string` - Now `Set` func set attribute to null if value is empty string
+```
+
+```release-note:feature
+`attribute/bool` - Add func `SetPtr`
+```
