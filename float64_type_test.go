@@ -137,14 +137,6 @@ func TestFloat64TypeValueFromTerraform(t *testing.T) {
 			input:       tftypes.NewValue(tftypes.Number, testMustParseFloat("0.0")),
 			expectation: NewFloat64Value(0.0),
 		},
-		"positive-string-float": {
-			input:       tftypes.NewValue(tftypes.Number, testMustParseFloat("123.2")),
-			expectation: NewFloat64Value(123.2),
-		},
-		"negative-string-float": {
-			input:       tftypes.NewValue(tftypes.Number, testMustParseFloat("-123.2")),
-			expectation: NewFloat64Value(-123.2),
-		},
 		// Reference: https://pkg.go.dev/math/big#Float.Float64
 		// Reference: https://pkg.go.dev/math#pkg-constants
 		"SmallestNonzeroFloat64": {

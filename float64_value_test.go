@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/hashicorp/terraform-plugin-framework/attr"
 	"github.com/hashicorp/terraform-plugin-go/tftypes"
+	"github.com/stretchr/testify/assert"
 )
 
 // testMustParseFloat parses a string into a *big.Float similar to cty and
@@ -390,4 +391,114 @@ func TestNewFloat64PointerValue(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestFloat64Value(t *testing.T) {
+	t.Run("Get", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		assert.Equal(t, 1.23, v.Get())
+	})
+
+	t.Run("GetPtr", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		p := v.GetPtr()
+		assert.NotNil(t, p)
+		assert.Equal(t, 1.23, *p)
+	})
+
+	t.Run("Set", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		v.Set(4.56)
+		assert.Equal(t, 4.56, v.Get())
+	})
+
+	t.Run("SetPtr", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		p := float64(4.56)
+		v.SetPtr(&p)
+		assert.Equal(t, 4.56, v.Get())
+
+		v.SetPtr(nil)
+		assert.True(t, v.IsNull())
+	})
+
+	t.Run("SetFloat32", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		v.SetFloat32(4.56)
+		assert.Equal(t, float32(4.56), v.GetFloat32())
+	})
+
+	t.Run("SetFloat64", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		v.SetFloat64(4.56)
+		assert.Equal(t, 4.56, v.Get())
+	})
+
+	t.Run("SetFloat32Ptr", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		p := float32(4.56)
+		v.SetFloat32Ptr(&p)
+		assert.Equal(t, float32(4.56), v.GetFloat32())
+
+		v.SetFloat32Ptr(nil)
+		assert.True(t, v.IsNull())
+
+		x := v.GetFloat32Ptr()
+		assert.Nil(t, x)
+	})
+
+	t.Run("SetFloat64Ptr", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		p := float64(4.56)
+		v.SetFloat64Ptr(&p)
+		assert.Equal(t, 4.56, v.Get())
+
+		v.SetFloat64Ptr(nil)
+		assert.True(t, v.IsNull())
+	})
+
+	t.Run("GetFloat32", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		assert.Equal(t, float32(1.23), v.GetFloat32())
+	})
+
+	t.Run("GetFloat64", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		assert.Equal(t, 1.23, v.GetFloat64())
+	})
+
+	t.Run("GetFloat32Ptr", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		p := v.GetFloat32Ptr()
+		assert.NotNil(t, p)
+		assert.Equal(t, float32(1.23), *p)
+	})
+
+	t.Run("GetFloat64Ptr", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		p := v.GetFloat64Ptr()
+		assert.NotNil(t, p)
+		assert.Equal(t, 1.23, *p)
+	})
+
+	t.Run("SetNull", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		v.SetNull()
+		assert.True(t, v.Float64Value.IsNull())
+	})
+
+	t.Run("SetUnknown", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		v.SetUnknown()
+		assert.True(t, v.Float64Value.IsUnknown())
+	})
+
+	t.Run("IsKnown", func(t *testing.T) {
+		v := NewFloat64Value(1.23)
+		assert.True(t, v.IsKnown())
+		v.SetNull()
+		assert.False(t, v.IsKnown())
+		v.SetUnknown()
+		assert.False(t, v.IsKnown())
+	})
 }
