@@ -1,4 +1,14 @@
 ## 0.1.0 (Unreleased)
+### :rotating_light: **Breaking Changes**
+
+* `attribute/string` - Now `Set` func set attribute to null if value is empty string ([GH-26](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/26))
+
+### :rocket: **New Features**
+
+* `attribute/bool` - Add func `SetPtr` ([GH-26](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/26))
+* `attribute/float64` - Add func `SetFloat32`, `SetFloat64`, `SetFloat32Ptr`, `SetFloat64Ptr`, `GetFloat32`, `GetFloat64`, `GetFloat32Ptr`, `GetFloat64Ptr` ([GH-26](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/26))
+* `attribute/int64` - Add funcs `SetPtr`, `SetInt`, `SetInt8`, `SetInt16`, `SetInt32`, `SetInt64`, `SetIntPtr`, `SetInt8Ptr`, `SetInt16Ptr`, `SetInt32Ptr`, `SetInt64Ptr`, `GetInt`, `GetInt8`, `GetInt16`, `GetInt32`, `GetInt64`, `GetIntPtr`, `GetInt8Ptr`, `GetInt16Ptr`, `GetInt32Ptr`, `GetInt64Ptr` ([GH-26](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/26))
+* `attribute/string` - Add func `SetPtr` ([GH-26](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/26))
 
 ### :dependabot: **Dependencies**
 
