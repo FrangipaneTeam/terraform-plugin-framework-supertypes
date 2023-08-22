@@ -1,4 +1,5 @@
-## 0.1.0 (Unreleased)
+## 0.2.0 (Unreleased)
+## 0.1.0 (August 22, 2023)
 ### :rotating_light: **Breaking Changes**
 
 * `attribute/string` - Now `Set` func set attribute to null if value is empty string ([GH-26](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/26))
