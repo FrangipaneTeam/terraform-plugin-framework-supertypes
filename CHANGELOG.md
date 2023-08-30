@@ -1,4 +1,9 @@
 ## 0.2.0 (Unreleased)
+
+### :dependabot: **Dependencies**
+
+* deps: bumps github.com/stretchr/testify from 1.6.1 to 1.8.4 ([GH-28](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/28))
+
 ## 0.1.0 (August 22, 2023)
 ### :rotating_light: **Breaking Changes**
 
