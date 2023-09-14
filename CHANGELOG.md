@@ -2,6 +2,7 @@
 
 ### :dependabot: **Dependencies**
 
+* deps: bumps actions/checkout from 3 to 4 ([GH-29](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/29))
 * deps: bumps github.com/hashicorp/terraform-plugin-framework from 1.3.5 to 1.4.0 ([GH-31](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/31))
 * deps: bumps github.com/stretchr/testify from 1.6.1 to 1.8.4 ([GH-28](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/28))
 
