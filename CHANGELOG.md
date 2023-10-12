@@ -8,6 +8,7 @@
 * deps: bumps github.com/hashicorp/terraform-plugin-framework from 1.4.0 to 1.4.1 ([GH-33](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/33))
 * deps: bumps github.com/stretchr/testify from 1.6.1 to 1.8.4 ([GH-28](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/28))
 * deps: bumps ncipollo/release-action from 1.12.0 to 1.13.0 ([GH-27](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/27))
+* deps: bumps stefanzweifel/git-auto-commit-action from 4 to 5 ([GH-34](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/34))
 
 ## 0.1.0 (August 22, 2023)
 ### :rotating_light: **Breaking Changes**
