@@ -162,7 +162,7 @@ func TestNewListValueFrom(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Empty(),
 					"List Type Validation Error",
-					"An unexpected error was encountered trying to validate an attribute value. This is always an error in the provider. Please report the following to the provider developer:\n\n"+
+					errorTest+
 						"expected List value, received tftypes.Value with value: tftypes.String<\"oops\">",
 				),
 			},
@@ -774,7 +774,7 @@ func TestListTypeValidate(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
 					"List Type Validation Error",
-					"An unexpected error was encountered trying to validate an attribute value. This is always an error in the provider. Please report the following to the provider developer:\n\n"+
+					errorTest+
 						"expected List value, received tftypes.Value with value: tftypes.Set[tftypes.String]<tftypes.String<\"testvalue\">>",
 				),
 			},
