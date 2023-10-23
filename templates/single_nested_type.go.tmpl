@@ -21,18 +21,29 @@ type {{ .TypeName }}NestedType struct {
 }
 
 func (t {{ .TypeName }}NestedType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.ObjectType)
+	switch o.(type) {
+	case SingleNestedType:
+		other, ok := o.(SingleNestedType)
+		if !ok {
+			return false
+		}
 
-	if !ok {
+		return t.ObjectType.Equal(other.ObjectType)
+	case basetypes.ObjectType:
+		other, ok := o.(basetypes.ObjectType)
+		if !ok {
+			return false
+		}
+
+		return t.ObjectType.Equal(other)
+	default:
 		return false
 	}
-
-	return t.ObjectType.Equal(other)
 }
 
 func (t {{ .TypeName }}NestedType) String() string {
 	var res strings.Builder
-	res.WriteString("types.ObjectType[")
+	res.WriteString("supertypes.SingleNestedType[")
 	keys := make([]string, 0, len(t.AttrTypes))
 	for k := range t.AttrTypes {
 		keys = append(keys, k)

@@ -21,7 +21,28 @@ type MapNestedType struct {
 }
 
 func (t MapNestedType) String() string {
-	return "types.MapType[" + t.ElementType().String() + "]"
+	return "supertypes.MapType[" + t.ElementType().String() + "]"
+}
+
+func (t MapNestedType) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case MapNestedType:
+		other, ok := o.(MapNestedType)
+		if !ok {
+			return false
+		}
+
+		return t.MapType.Equal(other.MapType)
+	case basetypes.MapType:
+		other, ok := o.(basetypes.MapType)
+		if !ok {
+			return false
+		}
+
+		return t.MapType.Equal(other)
+	default:
+		return false
+	}
 }
 
 func (t MapNestedType) ValueFromMap(_ context.Context, in basetypes.MapValue) (basetypes.MapValuable, diag.Diagnostics) {
