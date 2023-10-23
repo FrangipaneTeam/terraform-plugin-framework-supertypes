@@ -4,6 +4,7 @@
 
 * deps: bumps actions/checkout from 3 to 4 ([GH-29](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/29))
 * deps: bumps actions/checkout from 4.0.0 to 4.1.0 ([GH-32](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/32))
+* deps: bumps github.com/google/go-cmp from 0.5.9 to 0.6.0 ([GH-35](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/35))
 * deps: bumps github.com/hashicorp/terraform-plugin-framework from 1.3.5 to 1.4.0 ([GH-31](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/31))
 * deps: bumps github.com/hashicorp/terraform-plugin-framework from 1.4.0 to 1.4.1 ([GH-33](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/33))
 * deps: bumps github.com/stretchr/testify from 1.6.1 to 1.8.4 ([GH-28](https://github.com/orange-cloudavenue/terraform-provider-cloudavenue/issues/28))
