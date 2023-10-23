@@ -23,18 +23,29 @@ type SingleNestedType struct {
 }
 
 func (t SingleNestedType) Equal(o attr.Type) bool {
-	other, ok := o.(basetypes.ObjectType)
+	switch o.(type) {
+	case SingleNestedType:
+		other, ok := o.(SingleNestedType)
+		if !ok {
+			return false
+		}
 
-	if !ok {
+		return t.ObjectType.Equal(other.ObjectType)
+	case basetypes.ObjectType:
+		other, ok := o.(basetypes.ObjectType)
+		if !ok {
+			return false
+		}
+
+		return t.ObjectType.Equal(other)
+	default:
 		return false
 	}
-
-	return t.ObjectType.Equal(other)
 }
 
 func (t SingleNestedType) String() string {
 	var res strings.Builder
-	res.WriteString("types.ObjectType[")
+	res.WriteString("supertypes.SingleNestedType[")
 	keys := make([]string, 0, len(t.AttrTypes))
 	for k := range t.AttrTypes {
 		keys = append(keys, k)
@@ -79,4 +90,9 @@ func (t SingleNestedType) ValueFromTerraform(ctx context.Context, in tftypes.Val
 	}
 
 	return value, nil
+}
+
+func (t SingleNestedType) ValueType(ctx context.Context) attr.Value {
+    // SingleNestedValue defined in the value type section
+    return SingleNestedValue{}
 }
