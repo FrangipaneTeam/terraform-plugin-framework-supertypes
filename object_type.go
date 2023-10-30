@@ -16,9 +16,17 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.ObjectTypable = ObjectType{}
+var (
+	_ basetypes.ObjectTypable = ObjectType{}
+	_ basetypes.ObjectTypable = ObjectTypeOf[struct{}]{}
+)
 
 type ObjectType struct {
+	basetypes.ObjectType
+}
+
+// ObjectTypeOf is the attribute type of an ObjectValueOf.
+type ObjectTypeOf[T any] struct {
 	basetypes.ObjectType
 }
 
@@ -82,4 +90,71 @@ func (t ObjectType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (a
 
 func (t ObjectType) ValueType(_ context.Context) attr.Value {
 	return ObjectValue{}
+}
+
+func NewObjectTypeOf[T any](ctx context.Context) ObjectTypeOf[T] {
+	return ObjectTypeOf[T]{basetypes.ObjectType{AttrTypes: AttributeTypesMust[T](ctx)}}
+}
+
+func (t ObjectTypeOf[T]) Equal(o attr.Type) bool {
+	other, ok := o.(ObjectTypeOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return t.ObjectType.Equal(other.ObjectType)
+}
+
+func (t ObjectTypeOf[T]) String() string {
+	var zero T
+	return fmt.Sprintf("ObjectTypeOf[%T]", zero)
+}
+
+func (t ObjectTypeOf[T]) ValueFromObject(ctx context.Context, in basetypes.ObjectValue) (basetypes.ObjectValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if in.IsNull() {
+		return NewObjectValueOfNull[T](ctx), diags
+	}
+	if in.IsUnknown() {
+		return NewObjectValueOfUnknown[T](ctx), diags
+	}
+
+	objectValue, d := basetypes.NewObjectValue(AttributeTypesMust[T](ctx), in.Attributes())
+	diags.Append(d...)
+	if diags.HasError() {
+		return NewObjectValueOfUnknown[T](ctx), diags
+	}
+
+	value := ObjectValueOf[T]{
+		ObjectValue: objectValue,
+	}
+
+	return value, diags
+}
+
+func (t ObjectTypeOf[T]) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.ObjectType.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	objectValue, ok := attrValue.(basetypes.ObjectValue)
+
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	objectValuable, diags := t.ValueFromObject(ctx, objectValue)
+
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting ObjectValue to ObjectValuable: %v", diags)
+	}
+
+	return objectValuable, nil
+}
+
+func (t ObjectTypeOf[T]) ValueType(ctx context.Context) attr.Value {
+	return ObjectValueOf[T]{}
 }

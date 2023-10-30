@@ -14,11 +14,20 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}Type{}
+var (
+	_ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}Type{}
+	_ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}TypeOf[struct{}]{}
+)
 
 type {{ .TypeName }}Type struct {
 	basetypes.{{ .TypeName }}Type
 }
+
+// {{ .TypeName }}TypeOf is the attribute type of an {{ .TypeName }}ValueOf.
+type {{ .TypeName }}TypeOf[T any] struct {
+	basetypes.{{ .TypeName }}Type
+}
+
 
 func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
 	other, ok := o.({{ .TypeName }}Type)
@@ -32,7 +41,7 @@ func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
 
 func (t {{ .TypeName }}Type) String() string {
 	var res strings.Builder
-	res.WriteString("types.ObjectType[")
+	res.WriteString("types.{{ .TypeName }}Type[")
 	keys := make([]string, 0, len(t.AttrTypes))
 	for k := range t.AttrTypes {
 		keys = append(keys, k)
@@ -80,4 +89,72 @@ func (t {{ .TypeName }}Type) ValueFromTerraform(ctx context.Context, in tftypes.
 
 func (t {{ .TypeName }}Type) ValueType(_ context.Context) attr.Value {
 	return {{ .TypeName }}Value{}
+}
+
+
+func New{{ .TypeName }}TypeOf[T any](ctx context.Context) {{ .TypeName }}TypeOf[T] {
+	return {{ .TypeName }}TypeOf[T]{basetypes.{{ .TypeName }}Type{AttrTypes: AttributeTypesMust[T](ctx)}}
+}
+
+func (t {{ .TypeName }}TypeOf[T]) Equal(o attr.Type) bool {
+	other, ok := o.({{ .TypeName }}TypeOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
+}
+
+func (t {{ .TypeName }}TypeOf[T]) String() string {
+	var zero T
+	return fmt.Sprintf("{{ .TypeName }}TypeOf[%T]", zero)
+}
+
+func (t {{ .TypeName }}TypeOf[T]) ValueFrom{{ .TypeName }}(ctx context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if in.IsNull() {
+		return New{{ .TypeName }}ValueOfNull[T](ctx), diags
+	}
+	if in.IsUnknown() {
+		return New{{ .TypeName }}ValueOfUnknown[T](ctx), diags
+	}
+
+	objectValue, d := basetypes.New{{ .TypeName }}Value(AttributeTypesMust[T](ctx), in.Attributes())
+	diags.Append(d...)
+	if diags.HasError() {
+		return New{{ .TypeName }}ValueOfUnknown[T](ctx), diags
+	}
+
+	value := {{ .TypeName }}ValueOf[T]{
+		{{ .TypeName }}Value: objectValue,
+	}
+
+	return value, diags
+}
+
+func (t {{ .TypeName }}TypeOf[T]) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.{{ .TypeName }}Type.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	objectValue, ok := attrValue.(basetypes.{{ .TypeName }}Value)
+
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	objectValuable, diags := t.ValueFrom{{ .TypeName }}(ctx, objectValue)
+
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
+	}
+
+	return objectValuable, nil
+}
+
+func (t {{ .TypeName }}TypeOf[T]) ValueType(ctx context.Context) attr.Value {
+	return {{ .TypeName }}ValueOf[T]{}
 }

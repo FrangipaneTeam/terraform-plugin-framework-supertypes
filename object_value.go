@@ -67,3 +67,71 @@ func (v *ObjectValue) SetUnknown(ctx context.Context) {
 func (v ObjectValue) IsKnown() bool {
 	return !v.ObjectValue.IsNull() && !v.ObjectValue.IsUnknown()
 }
+
+// ObjectValueOf represents a Terraform Plugin Framework Object value whose corresponding Go type is the structure T.
+type ObjectValueOf[T any] struct {
+	basetypes.ObjectValue
+}
+
+var _ basetypes.ObjectValuable = ObjectValueOf[struct{}]{}
+
+func (v ObjectValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.(ObjectValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.ObjectValue.Equal(other.ObjectValue)
+}
+
+func (v ObjectValueOf[T]) Type(ctx context.Context) attr.Type {
+	return NewObjectTypeOf[T](ctx)
+}
+
+func NewObjectValueOfNull[T any](ctx context.Context) ObjectValueOf[T] {
+	return ObjectValueOf[T]{ObjectValue: basetypes.NewObjectNull(AttributeTypesMust[T](ctx))}
+}
+
+func NewObjectValueOfUnknown[T any](ctx context.Context) ObjectValueOf[T] {
+	return ObjectValueOf[T]{ObjectValue: basetypes.NewObjectUnknown(AttributeTypesMust[T](ctx))}
+}
+
+func NewObjectValueOf[T any](ctx context.Context, t *T) ObjectValueOf[T] {
+	return ObjectValueOf[T]{ObjectValue: MustDiag(basetypes.NewObjectValueFrom(ctx, AttributeTypesMust[T](ctx), t))}
+}
+
+func (v ObjectValueOf[T]) Get(ctx context.Context) (*T, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	ptr := new(T)
+
+	diags.Append(v.ObjectValue.As(ctx, ptr, basetypes.ObjectAsOptions{})...)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return ptr, diags
+}
+
+func (v *ObjectValueOf[T]) Set(ctx context.Context, t *T) (diags diag.Diagnostics) {
+	v.ObjectValue, diags = basetypes.NewObjectValueFrom(ctx, AttributeTypesMust[T](ctx), t)
+	return diags
+}
+
+// IsKnown returns whether the value is known.
+func (v ObjectValueOf[T]) IsKnown() bool {
+	if !v.IsNull() && !v.IsUnknown() {
+		return true
+	}
+
+	return false
+}
+
+func (v *ObjectValueOf[T]) SetNull(ctx context.Context) {
+	*v = NewObjectValueOfNull[T](ctx)
+}
+
+func (v *ObjectValueOf[T]) SetUnknown(ctx context.Context) {
+	*v = NewObjectValueOfUnknown[T](ctx)
+}

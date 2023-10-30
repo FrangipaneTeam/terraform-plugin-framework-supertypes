@@ -12,12 +12,52 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}NestedType{}
+var (
+	_ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}NestedType{}
 
+	_ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}NestedObjectTypeOf[struct{}]{}
+	_ NestedObjectType      = {{ .TypeName }}NestedObjectTypeOf[struct{}]{}
+)
+
+// {{ .TypeName }}NestedType is the attribute type of a {{ .TypeName }}NestedValue.
 type {{ .TypeName }}NestedType struct {
 	basetypes.{{ .TypeName }}Type
 }
 
+// {{ .TypeName }}NestedObjectTypeOf is the attribute type of a {{ .TypeName }}NestedObjectValueOf.
+type {{ .TypeName }}NestedObjectTypeOf[T any] struct {
+	basetypes.{{ .TypeName }}Type
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case {{ .TypeName }}NestedType:
+		other, ok := o.({{ .TypeName }}NestedType)
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
+	case basetypes.ObjectType:
+		other, ok := o.(basetypes.ObjectType)
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other)
+	case {{ .TypeName }}NestedObjectTypeOf[T]:
+		other, ok := o.({{ .TypeName }}NestedObjectTypeOf[T])
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
+	default:
+		return false
+	}
+}
+
+// String returns a string representation of the type.
 func (t {{ .TypeName }}NestedType) String() string {
 	return "supertypes.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
 }
@@ -43,13 +83,41 @@ func (t {{ .TypeName }}NestedType) Equal(o attr.Type) bool {
 	}
 }
 
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) String() string {
+	var zero T
+	return fmt.Sprintf("{{ .TypeName }}NestedObjectTypeOf[%T]", zero)
+}
+
 func (t {{ .TypeName }}NestedType) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
-	// Custom{{ .TypeName }}Value defined in the value type section
+	// TODO improve this
 	value := {{ .TypeName }}NestedValue{
 		{{ .TypeName }}Value: in,
 	}
 
 	return value, nil
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFrom{{ .TypeName }}(ctx context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if in.IsNull() {
+		return New{{ .TypeName }}NestedObjectValueOfNull[T](ctx), diags
+	}
+	if in.IsUnknown() {
+		return New{{ .TypeName }}NestedObjectValueOfUnknown[T](ctx), diags
+	}
+
+	listValue, d := basetypes.New{{ .TypeName }}Value(NewObjectTypeOf[T](ctx), in.Elements())
+	diags.Append(d...)
+	if diags.HasError() {
+		return New{{ .TypeName }}NestedObjectValueOfUnknown[T](ctx), diags
+	}
+
+	value := {{ .TypeName }}NestedObjectValueOf[T]{
+		{{ .TypeName }}Value: listValue,
+	}
+
+	return value, diags
 }
 
 func (t {{ .TypeName }}NestedType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
@@ -64,13 +132,34 @@ func (t {{ .TypeName }}NestedType) ValueFromTerraform(ctx context.Context, in tf
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
-	stringValuable, diags := t.ValueFrom{{ .TypeName }}(ctx, {{ .TypeName }}Value)
+	{{ .TypeName }}Valuable, diags := t.ValueFrom{{ .TypeName }}(ctx, {{ .TypeName }}Value)
 
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
 	}
 
-	return stringValuable, nil
+	return {{ .TypeName }}Valuable, nil
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.{{ .TypeName }}Type.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	listValue, ok := attrValue.(basetypes.{{ .TypeName }}Value)
+
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	listValuable, diags := t.ValueFrom{{ .TypeName }}(ctx, listValue)
+
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
+	}
+
+	return listValuable, nil
 }
 
 // TerraformType returns the tftypes.Type that should be used to
@@ -90,4 +179,45 @@ func (t {{ .TypeName }}NestedType) ElementType() attr.Type {
 	}
 
 	return t.{{ .TypeName }}Type.ElemType
+}
+
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueType(ctx context.Context) attr.Value {
+	return {{ .TypeName }}NestedObjectValueOf[T]{}
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) NewObjectPtr(ctx context.Context) (any, diag.Diagnostics) {
+	return nestedObjectTypeNewObjectPtr[T](ctx)
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) NewObjectSlice(ctx context.Context, len, cap int) (any, diag.Diagnostics) {
+	return nestedObjectTypeNewObjectSlice[T](ctx, len, cap)
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) NullValue(ctx context.Context) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	return New{{ .TypeName }}NestedObjectValueOfNull[T](ctx), diags
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectPtr(ctx context.Context, ptr any) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if v, ok := ptr.(*T); ok {
+		return New{{ .TypeName }}NestedObjectValueOfPtr(ctx, v), diags
+	}
+
+	diags.Append(diag.NewErrorDiagnostic("Invalid pointer value", fmt.Sprintf("incorrect type: want %T, got %T", (*T)(nil), ptr)))
+	return nil, diags
+}
+
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectSlice(ctx context.Context, slice any) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if v, ok := slice.([]*T); ok {
+		return New{{ .TypeName }}NestedObjectValueOfSlice(ctx, v), diags
+	}
+
+	diags.Append(diag.NewErrorDiagnostic("Invalid slice value", fmt.Sprintf("incorrect type: want %T, got %T", (*[]T)(nil), slice)))
+	return nil, diags
 }

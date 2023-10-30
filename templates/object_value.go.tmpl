@@ -65,3 +65,72 @@ func (v *{{ .TypeName }}Value) SetUnknown(ctx context.Context) {
 func (v {{ .TypeName }}Value) IsKnown() bool {
 	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
 }
+
+
+// {{ .TypeName }}ValueOf represents a Terraform Plugin Framework {{ .TypeName }} value whose corresponding Go type is the structure T.
+type {{ .TypeName }}ValueOf[T any] struct {
+	basetypes.{{ .TypeName }}Value
+}
+
+var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}ValueOf[struct{}]{}
+
+func (v {{ .TypeName }}ValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.({{ .TypeName }}ValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.{{ .TypeName }}Value.Equal(other.{{ .TypeName }}Value)
+}
+
+func (v {{ .TypeName }}ValueOf[T]) Type(ctx context.Context) attr.Type {
+	return New{{ .TypeName }}TypeOf[T](ctx)
+}
+
+func New{{ .TypeName }}ValueOfNull[T any](ctx context.Context) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{ {{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(AttributeTypesMust[T](ctx))}
+}
+
+func New{{ .TypeName }}ValueOfUnknown[T any](ctx context.Context) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{ {{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(AttributeTypesMust[T](ctx))}
+}
+
+func New{{ .TypeName }}ValueOf[T any](ctx context.Context, t *T) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{ {{ .TypeName }}Value: MustDiag(basetypes.New{{ .TypeName }}ValueFrom(ctx, AttributeTypesMust[T](ctx), t))}
+}
+
+func (v {{ .TypeName }}ValueOf[T]) Get(ctx context.Context) (*T, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	ptr := new(T)
+
+	diags.Append(v.{{ .TypeName }}Value.As(ctx, ptr, basetypes.{{ .TypeName }}AsOptions{})...)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return ptr, diags
+}
+
+func (v *{{ .TypeName }}ValueOf[T]) Set(ctx context.Context, t *T) (diags diag.Diagnostics) {
+	v.{{ .TypeName }}Value, diags = basetypes.New{{ .TypeName }}ValueFrom(ctx, AttributeTypesMust[T](ctx), t)
+	return diags
+}
+
+// IsKnown returns whether the value is known.
+func (v {{ .TypeName }}ValueOf[T]) IsKnown() bool {
+	if !v.IsNull() && !v.IsUnknown() {
+		return true
+	}
+
+	return false
+}
+
+func (v *{{ .TypeName }}ValueOf[T]) SetNull(ctx context.Context) {
+	*v = New{{ .TypeName }}ValueOfNull[T](ctx)
+}
+
+func (v *{{ .TypeName }}ValueOf[T]) SetUnknown(ctx context.Context) {
+	*v =New{{ .TypeName }}ValueOfUnknown[T](ctx)
+}

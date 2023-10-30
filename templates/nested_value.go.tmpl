@@ -11,14 +11,42 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+var (
+	_ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+
+	_ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}NestedObjectValueOf[struct{}]{}
+	_ NestedObjectValue      = {{ .TypeName }}NestedObjectValueOf[struct{}]{}
+)
 
 type {{ .TypeName }}NestedValue struct {
 	basetypes.{{ .TypeName }}Value
 }
 
+func New{{ .TypeName }}NestedObjectTypeOf[T any](ctx context.Context) {{ .TypeName }}NestedObjectTypeOf[T] {
+	return {{ .TypeName }}NestedObjectTypeOf[T]{basetypes.{{ .TypeName }}Type{ElemType: NewObjectTypeOf[T](ctx)}}
+}
+
+// {{ .TypeName }}NestedObjectValueOf represents a Terraform Plugin Framework {{ .TypeName }} value whose elements are of type ObjectTypeOf.
+type {{ .TypeName }}NestedObjectValueOf[T any] struct {
+	basetypes.{{ .TypeName }}Value
+}
+
 func (v {{ .TypeName }}NestedValue) Type(ctx context.Context) attr.Type {
 	return v.{{ .TypeName }}Value.Type(ctx)
+}
+
+func (v {{ .TypeName }}NestedObjectValueOf[T]) Type(ctx context.Context) attr.Type {
+	return New{{ .TypeName }}NestedObjectTypeOf[T](ctx)
+}
+
+func (v {{ .TypeName }}NestedObjectValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.({{ .TypeName }}NestedObjectValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.{{ .TypeName }}Value.Equal(other.{{ .TypeName }}Value)
 }
 
 func (v {{ .TypeName }}NestedValue) To{{ .TypeName }}Value(_ context.Context) (basetypes.{{ .TypeName }}Value, diag.Diagnostics) {
@@ -59,4 +87,64 @@ func (v *{{ .TypeName }}NestedValue) SetUnknown(ctx context.Context) {
 
 func (v {{ .TypeName }}NestedValue) IsKnown() bool {
 	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}
+
+{{ if eq .TypeName "Map" -}}
+// Get returns a slice of pointers to the elements of a {{ .TypeName }}NestedObject.
+func (v {{ .TypeName }}NestedObjectValueOf[T]) Get(ctx context.Context) (map[string]*T, diag.Diagnostics) {
+	return nestedObjectValueMap[T](ctx, v.{{ .TypeName }}Value)
+}
+{{ else -}}
+// Get returns a slice of pointers to the elements of a {{ .TypeName }}NestedObject.
+func (v {{ .TypeName }}NestedObjectValueOf[T]) Get(ctx context.Context) ([]*T, diag.Diagnostics) {
+	return nestedObjectValueSlice[T](ctx, v.{{ .TypeName }}Value)
+}
+{{ end -}}
+
+// Set returns a {{ .TypeName }}NestedObjectValueOf from a slice of pointers to the elements of a {{ .TypeName }}NestedObject.
+func (v *{{ .TypeName }}NestedObjectValueOf[T]) Set(ctx context.Context, slice []*T) diag.Diagnostics {
+	var diags diag.Diagnostics
+	v.{{ .TypeName }}Value, diags = basetypes.New{{ .TypeName }}ValueFrom(ctx, NewObjectTypeOf[T](ctx), slice)
+	return diags
+}
+
+func New{{ .TypeName }}NestedObjectValueOfNull[T any](ctx context.Context) {{ .TypeName }}NestedObjectValueOf[T] {
+	return {{ .TypeName }}NestedObjectValueOf[T]{ {{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(NewObjectTypeOf[T](ctx))}
+}
+
+func New{{ .TypeName }}NestedObjectValueOfUnknown[T any](ctx context.Context) {{ .TypeName }}NestedObjectValueOf[T] {
+	return {{ .TypeName }}NestedObjectValueOf[T]{ {{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(NewObjectTypeOf[T](ctx))}
+}
+
+func New{{ .TypeName }}NestedObjectValueOfPtr[T any](ctx context.Context, t *T) {{ .TypeName }}NestedObjectValueOf[T] {
+	return New{{ .TypeName }}NestedObjectValueOfSlice(ctx, []*T{t})
+}
+
+func New{{ .TypeName }}NestedObjectValueOfSlice[T any](ctx context.Context, ts []*T) {{ .TypeName }}NestedObjectValueOf[T] {
+	return new{{ .TypeName }}NestedObjectValueOf[T](ctx, ts)
+}
+
+func New{{ .TypeName }}NestedObjectValueOfValueSlice[T any](ctx context.Context, ts []T) {{ .TypeName }}NestedObjectValueOf[T] {
+	return new{{ .TypeName }}NestedObjectValueOf[T](ctx, ts)
+}
+
+func new{{ .TypeName }}NestedObjectValueOf[T any](ctx context.Context, elements any) {{ .TypeName }}NestedObjectValueOf[T] {
+	return {{ .TypeName }}NestedObjectValueOf[T]{ {{ .TypeName }}Value: MustDiag(basetypes.New{{ .TypeName }}ValueFrom(ctx, NewObjectTypeOf[T](ctx), elements))}
+}
+
+// IsKnown returns whether the value is known.
+func (v {{ .TypeName }}NestedObjectValueOf[T]) IsKnown() bool {
+	if !v.IsNull() && !v.IsUnknown() {
+		return true
+	}
+
+	return false
+}
+
+func (v *{{ .TypeName }}NestedObjectValueOf[T]) SetNull(ctx context.Context) {
+	*v = New{{ .TypeName }}NestedObjectValueOfNull[T](ctx)
+}
+
+func (v *{{ .TypeName }}NestedObjectValueOf[T]) SetUnknown(ctx context.Context) {
+	*v = New{{ .TypeName }}NestedObjectValueOfUnknown[T](ctx)
 }

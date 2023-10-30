@@ -13,14 +13,42 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.MapValuable = MapValue{}
+var (
+	_ basetypes.MapValuable = MapValue{}
+
+	_ basetypes.MapValuable = MapNestedObjectValueOf[struct{}]{}
+	_ NestedObjectValue     = MapNestedObjectValueOf[struct{}]{}
+)
 
 type MapNestedValue struct {
 	basetypes.MapValue
 }
 
+func NewMapNestedObjectTypeOf[T any](ctx context.Context) MapNestedObjectTypeOf[T] {
+	return MapNestedObjectTypeOf[T]{basetypes.MapType{ElemType: NewObjectTypeOf[T](ctx)}}
+}
+
+// MapNestedObjectValueOf represents a Terraform Plugin Framework Map value whose elements are of type ObjectTypeOf.
+type MapNestedObjectValueOf[T any] struct {
+	basetypes.MapValue
+}
+
 func (v MapNestedValue) Type(ctx context.Context) attr.Type {
 	return v.MapValue.Type(ctx)
+}
+
+func (v MapNestedObjectValueOf[T]) Type(ctx context.Context) attr.Type {
+	return NewMapNestedObjectTypeOf[T](ctx)
+}
+
+func (v MapNestedObjectValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.(MapNestedObjectValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.MapValue.Equal(other.MapValue)
 }
 
 func (v MapNestedValue) ToMapValue(_ context.Context) (basetypes.MapValue, diag.Diagnostics) {
@@ -61,4 +89,57 @@ func (v *MapNestedValue) SetUnknown(ctx context.Context) {
 
 func (v MapNestedValue) IsKnown() bool {
 	return !v.MapValue.IsNull() && !v.MapValue.IsUnknown()
+}
+
+// Get returns a slice of pointers to the elements of a MapNestedObject.
+func (v MapNestedObjectValueOf[T]) Get(ctx context.Context) (map[string]*T, diag.Diagnostics) {
+	return nestedObjectValueMap[T](ctx, v.MapValue)
+}
+
+// Set returns a MapNestedObjectValueOf from a slice of pointers to the elements of a MapNestedObject.
+func (v *MapNestedObjectValueOf[T]) Set(ctx context.Context, slice []*T) diag.Diagnostics {
+	var diags diag.Diagnostics
+	v.MapValue, diags = basetypes.NewMapValueFrom(ctx, NewObjectTypeOf[T](ctx), slice)
+	return diags
+}
+
+func NewMapNestedObjectValueOfNull[T any](ctx context.Context) MapNestedObjectValueOf[T] {
+	return MapNestedObjectValueOf[T]{MapValue: basetypes.NewMapNull(NewObjectTypeOf[T](ctx))}
+}
+
+func NewMapNestedObjectValueOfUnknown[T any](ctx context.Context) MapNestedObjectValueOf[T] {
+	return MapNestedObjectValueOf[T]{MapValue: basetypes.NewMapUnknown(NewObjectTypeOf[T](ctx))}
+}
+
+func NewMapNestedObjectValueOfPtr[T any](ctx context.Context, t *T) MapNestedObjectValueOf[T] {
+	return NewMapNestedObjectValueOfSlice(ctx, []*T{t})
+}
+
+func NewMapNestedObjectValueOfSlice[T any](ctx context.Context, ts []*T) MapNestedObjectValueOf[T] {
+	return newMapNestedObjectValueOf[T](ctx, ts)
+}
+
+func NewMapNestedObjectValueOfValueSlice[T any](ctx context.Context, ts []T) MapNestedObjectValueOf[T] {
+	return newMapNestedObjectValueOf[T](ctx, ts)
+}
+
+func newMapNestedObjectValueOf[T any](ctx context.Context, elements any) MapNestedObjectValueOf[T] {
+	return MapNestedObjectValueOf[T]{MapValue: MustDiag(basetypes.NewMapValueFrom(ctx, NewObjectTypeOf[T](ctx), elements))}
+}
+
+// IsKnown returns whether the value is known.
+func (v MapNestedObjectValueOf[T]) IsKnown() bool {
+	if !v.IsNull() && !v.IsUnknown() {
+		return true
+	}
+
+	return false
+}
+
+func (v *MapNestedObjectValueOf[T]) SetNull(ctx context.Context) {
+	*v = NewMapNestedObjectValueOfNull[T](ctx)
+}
+
+func (v *MapNestedObjectValueOf[T]) SetUnknown(ctx context.Context) {
+	*v = NewMapNestedObjectValueOfUnknown[T](ctx)
 }
