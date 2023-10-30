@@ -21,7 +21,28 @@ type ListNestedType struct {
 }
 
 func (t ListNestedType) String() string {
-	return "types.ListType[" + t.ElementType().String() + "]"
+	return "supertypes.ListType[" + t.ElementType().String() + "]"
+}
+
+func (t ListNestedType) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case ListNestedType:
+		other, ok := o.(ListNestedType)
+		if !ok {
+			return false
+		}
+
+		return t.ListType.Equal(other.ListType)
+	case basetypes.ListType:
+		other, ok := o.(basetypes.ListType)
+		if !ok {
+			return false
+		}
+
+		return t.ListType.Equal(other)
+	default:
+		return false
+	}
 }
 
 func (t ListNestedType) ValueFromList(_ context.Context, in basetypes.ListValue) (basetypes.ListValuable, diag.Diagnostics) {

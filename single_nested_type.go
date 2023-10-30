@@ -91,8 +91,3 @@ func (t SingleNestedType) ValueFromTerraform(ctx context.Context, in tftypes.Val
 
 	return value, nil
 }
-
-func (t SingleNestedType) ValueType(ctx context.Context) attr.Value {
-    // SingleNestedValue defined in the value type section
-    return SingleNestedValue{}
-}

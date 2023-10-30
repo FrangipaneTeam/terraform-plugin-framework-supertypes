@@ -19,7 +19,28 @@ type {{ .TypeName }}NestedType struct {
 }
 
 func (t {{ .TypeName }}NestedType) String() string {
-	return "types.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
+	return "supertypes.{{ .TypeName }}Type[" + t.ElementType().String() + "]"
+}
+
+func (t {{ .TypeName }}NestedType) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case {{ .TypeName }}NestedType:
+		other, ok := o.({{ .TypeName }}NestedType)
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
+	case basetypes.{{ .TypeName }}Type:
+		other, ok := o.(basetypes.{{ .TypeName }}Type)
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other)
+	default:
+		return false
+	}
 }
 
 func (t {{ .TypeName }}NestedType) ValueFrom{{ .TypeName }}(_ context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {

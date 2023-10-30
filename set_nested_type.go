@@ -21,7 +21,28 @@ type SetNestedType struct {
 }
 
 func (t SetNestedType) String() string {
-	return "types.SetType[" + t.ElementType().String() + "]"
+	return "supertypes.SetType[" + t.ElementType().String() + "]"
+}
+
+func (t SetNestedType) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case SetNestedType:
+		other, ok := o.(SetNestedType)
+		if !ok {
+			return false
+		}
+
+		return t.SetType.Equal(other.SetType)
+	case basetypes.SetType:
+		other, ok := o.(basetypes.SetType)
+		if !ok {
+			return false
+		}
+
+		return t.SetType.Equal(other)
+	default:
+		return false
+	}
 }
 
 func (t SetNestedType) ValueFromSet(_ context.Context, in basetypes.SetValue) (basetypes.SetValuable, diag.Diagnostics) {
