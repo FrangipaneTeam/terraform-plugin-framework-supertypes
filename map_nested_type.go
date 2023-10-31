@@ -14,12 +14,52 @@ import (
 )
 
 // Ensure the implementation satisfies the expected interfaces.
-var _ basetypes.MapTypable = MapNestedType{}
+var (
+	_ basetypes.MapTypable = MapNestedType{}
 
+	_ basetypes.MapTypable = MapNestedObjectTypeOf[struct{}]{}
+	_ NestedObjectType     = MapNestedObjectTypeOf[struct{}]{}
+)
+
+// MapNestedType is the attribute type of a MapNestedValue.
 type MapNestedType struct {
 	basetypes.MapType
 }
 
+// MapNestedObjectTypeOf is the attribute type of a MapNestedObjectValueOf.
+type MapNestedObjectTypeOf[T any] struct {
+	basetypes.MapType
+}
+
+func (t MapNestedObjectTypeOf[T]) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case MapNestedType:
+		other, ok := o.(MapNestedType)
+		if !ok {
+			return false
+		}
+
+		return t.MapType.Equal(other.MapType)
+	case basetypes.ObjectType:
+		other, ok := o.(basetypes.ObjectType)
+		if !ok {
+			return false
+		}
+
+		return t.MapType.Equal(other)
+	case MapNestedObjectTypeOf[T]:
+		other, ok := o.(MapNestedObjectTypeOf[T])
+		if !ok {
+			return false
+		}
+
+		return t.MapType.Equal(other.MapType)
+	default:
+		return false
+	}
+}
+
+// String returns a string representation of the type.
 func (t MapNestedType) String() string {
 	return "supertypes.MapType[" + t.ElementType().String() + "]"
 }
@@ -45,13 +85,41 @@ func (t MapNestedType) Equal(o attr.Type) bool {
 	}
 }
 
+func (t MapNestedObjectTypeOf[T]) String() string {
+	var zero T
+	return fmt.Sprintf("MapNestedObjectTypeOf[%T]", zero)
+}
+
 func (t MapNestedType) ValueFromMap(_ context.Context, in basetypes.MapValue) (basetypes.MapValuable, diag.Diagnostics) {
-	// CustomMapValue defined in the value type section
+	// TODO improve this
 	value := MapNestedValue{
 		MapValue: in,
 	}
 
 	return value, nil
+}
+
+func (t MapNestedObjectTypeOf[T]) ValueFromMap(ctx context.Context, in basetypes.MapValue) (basetypes.MapValuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if in.IsNull() {
+		return NewMapNestedObjectValueOfNull[T](ctx), diags
+	}
+	if in.IsUnknown() {
+		return NewMapNestedObjectValueOfUnknown[T](ctx), diags
+	}
+
+	listValue, d := basetypes.NewMapValue(NewObjectTypeOf[T](ctx), in.Elements())
+	diags.Append(d...)
+	if diags.HasError() {
+		return NewMapNestedObjectValueOfUnknown[T](ctx), diags
+	}
+
+	value := MapNestedObjectValueOf[T]{
+		MapValue: listValue,
+	}
+
+	return value, diags
 }
 
 func (t MapNestedType) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
@@ -66,13 +134,34 @@ func (t MapNestedType) ValueFromTerraform(ctx context.Context, in tftypes.Value)
 		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
 	}
 
-	stringValuable, diags := t.ValueFromMap(ctx, MapValue)
+	MapValuable, diags := t.ValueFromMap(ctx, MapValue)
 
 	if diags.HasError() {
 		return nil, fmt.Errorf("unexpected error converting MapValue to MapValuable: %v", diags)
 	}
 
-	return stringValuable, nil
+	return MapValuable, nil
+}
+
+func (t MapNestedObjectTypeOf[T]) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.MapType.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	listValue, ok := attrValue.(basetypes.MapValue)
+
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	listValuable, diags := t.ValueFromMap(ctx, listValue)
+
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting MapValue to MapValuable: %v", diags)
+	}
+
+	return listValuable, nil
 }
 
 // TerraformType returns the tftypes.Type that should be used to
@@ -92,4 +181,44 @@ func (t MapNestedType) ElementType() attr.Type {
 	}
 
 	return t.MapType.ElemType
+}
+
+func (t MapNestedObjectTypeOf[T]) ValueType(ctx context.Context) attr.Value {
+	return MapNestedObjectValueOf[T]{}
+}
+
+func (t MapNestedObjectTypeOf[T]) NewObjectPtr(ctx context.Context) (any, diag.Diagnostics) {
+	return nestedObjectTypeNewObjectPtr[T](ctx)
+}
+
+func (t MapNestedObjectTypeOf[T]) NewObjectSlice(ctx context.Context, len, cap int) (any, diag.Diagnostics) {
+	return nestedObjectTypeNewObjectSlice[T](ctx, len, cap)
+}
+
+func (t MapNestedObjectTypeOf[T]) NullValue(ctx context.Context) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	return NewMapNestedObjectValueOfNull[T](ctx), diags
+}
+
+func (t MapNestedObjectTypeOf[T]) ValueFromObjectPtr(ctx context.Context, ptr any) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if v, ok := ptr.(*T); ok {
+		return NewMapNestedObjectValueOfPtr(ctx, v), diags
+	}
+
+	diags.Append(diag.NewErrorDiagnostic("Invalid pointer value", fmt.Sprintf("incorrect type: want %T, got %T", (*T)(nil), ptr)))
+	return nil, diags
+}
+
+func (t MapNestedObjectTypeOf[T]) ValueFromObjectSlice(ctx context.Context, slice any) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if v, ok := slice.([]*T); ok {
+		return NewMapNestedObjectValueOfSlice(ctx, v), diags
+	}
+
+	diags.Append(diag.NewErrorDiagnostic("Invalid slice value", fmt.Sprintf("incorrect type: want %T, got %T", (*[]T)(nil), slice)))
+	return nil, diags
 }

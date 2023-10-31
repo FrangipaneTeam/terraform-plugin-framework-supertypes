@@ -62,3 +62,75 @@ func (v *SingleNestedValue) SetUnknown(ctx context.Context) {
 func (v SingleNestedValue) IsKnown() bool {
 	return !v.ObjectValue.IsNull() && !v.ObjectValue.IsUnknown()
 }
+
+// SingleNestedObjectValueOf represents a Terraform Plugin Framework Single value whose corresponding Go type is the structure T.
+type SingleNestedObjectValueOf[T any] struct {
+	basetypes.ObjectValue
+}
+
+var _ basetypes.ObjectValuable = SingleNestedObjectValueOf[struct{}]{}
+
+func (v SingleNestedObjectValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.(SingleNestedObjectValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.ObjectValue.Equal(other.ObjectValue)
+}
+
+func (v SingleNestedObjectValueOf[T]) Type(ctx context.Context) attr.Type {
+	return NewSingleNestedObjectTypeOf[T](ctx)
+}
+
+func NewSingleNestedObjectValueOfNull[T any](ctx context.Context) SingleNestedObjectValueOf[T] {
+	return SingleNestedObjectValueOf[T]{ObjectValue: basetypes.NewObjectNull(AttributeTypesMust[T](ctx))}
+}
+
+func NewSingleNestedObjectValueOfUnknown[T any](ctx context.Context) SingleNestedObjectValueOf[T] {
+	return SingleNestedObjectValueOf[T]{ObjectValue: basetypes.NewObjectUnknown(AttributeTypesMust[T](ctx))}
+}
+
+func NewSingleNestedObjectValueOf[T any](ctx context.Context, t *T) SingleNestedObjectValueOf[T] {
+	return SingleNestedObjectValueOf[T]{ObjectValue: MustDiag(basetypes.NewObjectValueFrom(ctx, AttributeTypesMust[T](ctx), t))}
+}
+
+func (v SingleNestedObjectValueOf[T]) Get(ctx context.Context) (*T, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	ptr := new(T)
+
+	diags.Append(v.ObjectValue.As(ctx, ptr, basetypes.ObjectAsOptions{})...)
+	if diags.HasError() {
+		return nil, diags
+	}
+
+	return ptr, diags
+}
+
+func (v *SingleNestedObjectValueOf[T]) Set(ctx context.Context, t *T) (diags diag.Diagnostics) {
+	v.ObjectValue, diags = basetypes.NewObjectValueFrom(ctx, AttributeTypesMust[T](ctx), t)
+	return diags
+}
+
+// IsKnown returns whether the value is known.
+func (v SingleNestedObjectValueOf[T]) IsKnown() bool {
+	if !v.IsNull() && !v.IsUnknown() {
+		return true
+	}
+
+	return false
+}
+
+func newSingleNestedObjectValueOf[T any](ctx context.Context, t *T) SingleNestedObjectValueOf[T] {
+	return SingleNestedObjectValueOf[T]{ObjectValue: MustDiag(basetypes.NewObjectValueFrom(ctx, AttributeTypesMust[T](ctx), t))}
+}
+
+func (v *SingleNestedObjectValueOf[T]) SetNull(ctx context.Context) {
+	*v = NewSingleNestedObjectValueOfNull[T](ctx)
+}
+
+func (v *SingleNestedObjectValueOf[T]) SetUnknown(ctx context.Context) {
+	*v = NewSingleNestedObjectValueOfUnknown[T](ctx)
+}
