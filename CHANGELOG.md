@@ -1,4 +1,9 @@
 ## 0.3.0 (Unreleased)
+
+### :dependabot: **Dependencies**
+
+* deps: bumps github.com/fatih/color from 1.15.0 to 1.16.0 (GH-42)
+
 ## 0.2.0 (October 31, 2023)
 ## 0.1.1 (October 23, 2023)
 
