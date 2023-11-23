@@ -3,6 +3,7 @@
 ### :dependabot: **Dependencies**
 
 * deps: bumps github.com/fatih/color from 1.15.0 to 1.16.0 (GH-42)
+* deps: bumps github.com/hashicorp/terraform-plugin-go from 0.19.0 to 0.19.1 (GH-44)
 
 ## 0.2.0 (October 31, 2023)
 ## 0.1.1 (October 23, 2023)
