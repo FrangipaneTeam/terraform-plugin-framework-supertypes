@@ -12,6 +12,10 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}Value{}
+var _ basetypes.{{ .TypeName }}Valuable = {{ .TypeName }}ValueOf[struct{}]{}
+
+// * {{ .TypeName }}Type
+
 
 type {{ .TypeName }}Value struct {
 	basetypes.{{ .TypeName }}Value
@@ -91,4 +95,113 @@ func (v *{{ .TypeName }}Value) SetUnknown(ctx context.Context) {
 
 func (v {{ .TypeName }}Value) IsKnown() bool {
 	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}
+
+// * {{ .TypeName }}TypeOf
+
+type {{ .TypeName }}ValueOf[T any] struct {
+	basetypes.{{ .TypeName }}Value
+}
+
+// To{{ .TypeName }}Value converts the given value to a {{ .TypeName }}Value.
+func (v {{ .TypeName }}ValueOf[T]) To{{ .TypeName }}Value(_ context.Context) (basetypes.{{ .TypeName }}Value, diag.Diagnostics) {
+	return v.{{ .TypeName }}Value, nil
+}
+
+// Equal returns true if the given value is equal to this value.
+func (v {{ .TypeName }}ValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.({{ .TypeName }}ValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.{{ .TypeName }}Value.Equal(other.{{ .TypeName }}Value)
+}
+
+// Type returns the type of this value.
+func (v {{ .TypeName }}ValueOf[T]) Type(ctx context.Context) attr.Type {
+	return New{{ .TypeName }}TypeOf[T](ctx)
+}
+
+// Get returns a {{ .TypeName }}ValueOf from the given value.
+func (v {{ .TypeName }}ValueOf[T]) Get(ctx context.Context) (values {{ if eq .TypeName "Map"}}map[string]T{{else}}[]T{{end}}, diags diag.Diagnostics) {
+	{{ if eq .TypeName "Map"}}
+		values = make(map[string]T, len(v.{{ .TypeName }}Value.Elements()))
+	{{ else }}
+		values = make([]T, len(v.{{ .TypeName }}Value.Elements()))
+	{{ end }}
+	
+	diags.Append(v.{{ .TypeName }}Value.ElementsAs(ctx, &values, false)...)
+	return
+}
+
+// Set sets the value of this value.
+func (v *{{ .TypeName }}ValueOf[T]) Set(ctx context.Context, elements {{ if eq .TypeName "Map"}}map[string]T{{else}}[]T{{end}}) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.{{ .TypeName }}Value, d = types.{{ .TypeName }}ValueFrom(ctx, v.ElementType(ctx), elements)
+	return d
+}
+
+// New{{ .TypeName }}ValueOfUnknown returns a new {{ .TypeName }}ValueOf with an unknown value.
+func New{{ .TypeName }}ValueOfUnknown[T any](ctx context.Context) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(ElementTypeMust[T](ctx)),
+	}
+}
+
+// New{{ .TypeName }}ValueOfNull returns a new {{ .TypeName }}ValueOf with a null value.
+func New{{ .TypeName }}ValueOfNull[T any](ctx context.Context) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{
+		{{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(ElementTypeMust[T](ctx)),
+	}
+}
+
+{{ if ne .TypeName "Map"}}
+// new{{ .TypeName }}ValueOf is a helper function to create a new {{ .TypeName }}ValueOf.
+func new{{ .TypeName }}ValueOf[T any](ctx context.Context, elements any) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{ {{ .TypeName }}Value: MustDiag(basetypes.New{{ .TypeName }}ValueFrom(ctx, ElementTypeMust[T](ctx), elements))}
+}
+
+// New{{ .TypeName }}ValueOfSlice returns a new {{ .TypeName }}ValueOf with the given slice value.
+func New{{ .TypeName }}ValueOfSlice[T any](ctx context.Context, elements []T) {{ .TypeName }}ValueOf[T] {
+	return new{{ .TypeName }}ValueOf[T](ctx, elements)
+}
+
+// New{{ .TypeName }}ValueOfSlicePtr returns a new {{ .TypeName }}ValueOf with the given slice value.
+func New{{ .TypeName }}ValueOfSlicePtr[T any](ctx context.Context, elements []*T) {{ .TypeName }}ValueOf[T] {
+	return new{{ .TypeName }}ValueOf[T](ctx, elements)
+}
+{{ end }}
+
+{{ if eq .TypeName "Map"}}
+// new{{ .TypeName }}ValueOf is a helper function to create a new {{ .TypeName }}ValueOf.
+func new{{ .TypeName }}ValueOf[T any](ctx context.Context, elements any) {{ .TypeName }}ValueOf[T] {
+	return {{ .TypeName }}ValueOf[T]{
+		{{ .TypeName }}Value: MustDiag(types.{{ .TypeName }}ValueFrom(ctx, ElementTypeMust[T](ctx), elements)),
+	}
+}
+
+// New{{ .TypeName }}ValueOfMap returns a new {{ .TypeName }}ValueOf with the given map value.
+func New{{ .TypeName }}ValueOfMap[T any](ctx context.Context, elements map[string]T) ({{ .TypeName }}ValueOf[T], diag.Diagnostics) {
+	v, d := types.{{ .TypeName }}ValueFrom(ctx, ElementTypeMust[T](ctx), elements)
+	return {{ .TypeName }}ValueOf[T]{
+		{{ .TypeName }}Value: v,
+	}, d
+}
+{{ end }}
+
+// IsKnown returns true if the value is known.
+func (v {{ .TypeName }}ValueOf[T]) IsKnown() bool {
+	return !v.{{ .TypeName }}Value.IsNull() && !v.{{ .TypeName }}Value.IsUnknown()
+}
+
+// SetNull sets the value to null.
+func (v *{{ .TypeName }}ValueOf[T]) SetNull(ctx context.Context) {
+	(*v) = New{{ .TypeName }}ValueOfNull[T](ctx)
+}
+
+// SetUnknown sets the value to unknown.
+func (v *{{ .TypeName }}ValueOf[T]) SetUnknown(ctx context.Context) {
+	(*v) = New{{ .TypeName }}ValueOfUnknown[T](ctx)
 }

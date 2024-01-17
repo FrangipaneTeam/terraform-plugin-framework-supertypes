@@ -334,7 +334,7 @@ func TestMapTypeString(t *testing.T) {
 		},
 		"ElemType-missing": {
 			input:    MapType{},
-			expected: "supertypes.MapType[!!! MISSING TYPE !!!]",
+			expected: "supertypes.MapType[!!! SUPER MISSING TYPE !!!]",
 		},
 	}
 

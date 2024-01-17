@@ -13,19 +13,33 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}Type{}
+var _ basetypes.{{ .TypeName }}Typable = {{ .TypeName }}TypeOf[struct{}]{}
+
+// * {{ .TypeName }}Type
 
 type {{ .TypeName }}Type struct {
 	basetypes.{{ .TypeName }}Type
 }
 
 func (t {{ .TypeName }}Type) Equal(o attr.Type) bool {
-	other, ok := o.({{ .TypeName }}Type)
+	switch o.(type) {
+	case {{ .TypeName }}Type:
+		other, ok := o.({{ .TypeName }}Type)
+		if !ok {
+			return false
+		}
 
-	if !ok {
+		return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
+	case basetypes.ObjectType:
+		other, ok := o.(basetypes.ObjectType)
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other)
+	default:
 		return false
 	}
-
-	return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
 }
 
 func (t {{ .TypeName }}Type) String() string {
@@ -79,4 +93,99 @@ func (t {{ .TypeName }}Type) ValueType(ctx context.Context) attr.Value {
 	return {{ .TypeName }}Value{
 		{{ .TypeName }}Value: t.{{ .TypeName }}Type.ValueType(ctx).(basetypes.{{ .TypeName }}Value),
 	}
+}
+
+// * -----------------
+// * {{ .TypeName }}TypeOf is a type that implements {{ .TypeName }}Typable for a specific type.
+
+type {{ .TypeName }}TypeOf[T any] struct {
+	basetypes.{{ .TypeName }}Type
+}
+
+func New{{ .TypeName }}TypeOf[T any](ctx context.Context) {{ .TypeName }}TypeOf[T] {
+	return {{ .TypeName }}TypeOf[T]{ {{ .TypeName }}Type: basetypes.{{ .TypeName }}Type{ElemType: ElementTypeMust[T](ctx)}}
+}
+
+// Equal returns true if the given type is equal to this type.
+func (t {{ .TypeName }}TypeOf[T]) Equal(o attr.Type) bool {
+	switch o.(type) {
+	case {{ .TypeName }}TypeOf[T]:
+		other, ok := o.({{ .TypeName }}TypeOf[T])
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other.{{ .TypeName }}Type)
+	case basetypes.{{ .TypeName }}Type:
+		other, ok := o.(basetypes.{{ .TypeName }}Type)
+		if !ok {
+			return false
+		}
+
+		return t.{{ .TypeName }}Type.Equal(other)
+	default:
+		return false
+	}
+}
+
+
+// ValueFrom{{ .TypeName }} converts a basetypes.{{ .TypeName }}Value to a {{ .TypeName }}ValueOf.
+func (t {{ .TypeName }}TypeOf[T]) ValueFrom{{ .TypeName }}(ctx context.Context, in basetypes.{{ .TypeName }}Value) (basetypes.{{ .TypeName }}Valuable, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if in.IsNull() {
+		return New{{ .TypeName }}ValueOfNull[T](ctx), diags
+	}
+	if in.IsUnknown() {
+		return New{{ .TypeName }}ValueOfUnknown[T](ctx), diags
+	}
+
+	v, d := basetypes.New{{ .TypeName }}Value(ElementTypeMust[T](ctx), in.Elements())
+	diags.Append(d...)
+	if diags.HasError() {
+		return New{{ .TypeName }}ValueOfUnknown[T](ctx), diags
+	}
+
+	value := {{ .TypeName }}ValueOf[T]{
+		{{ .TypeName }}Value: v,
+	}
+
+	return value, diags
+}
+
+// String returns a string representation of the type.
+func (t {{ .TypeName }}TypeOf[T]) String() string {
+	var zero T
+	return fmt.Sprintf("supertypes.{{ .TypeName }}TypeOf[%T]", zero)
+}
+
+
+// ValueFromTerraform converts a tftypes.Value to a {{ .TypeName }}ValueOf.
+func (t {{ .TypeName }}TypeOf[T]) ValueFromTerraform(ctx context.Context, in tftypes.Value) (attr.Value, error) {
+	attrValue, err := t.{{ .TypeName }}Type.ValueFromTerraform(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	{{ .TypeName }}Value, ok := attrValue.(basetypes.{{ .TypeName }}Value)
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type of %T", attrValue)
+	}
+
+	{{ .TypeName }}Valuable, diags := t.ValueFrom{{ .TypeName }}(ctx, {{ .TypeName }}Value)
+	if diags.HasError() {
+		return nil, fmt.Errorf("unexpected error converting {{ .TypeName }}Value to {{ .TypeName }}Valuable: %v", diags)
+	}
+
+	return {{ .TypeName }}Valuable, nil
+}
+
+// ValueType returns the value type of this {{ .TypeName }}.
+func (t {{ .TypeName }}TypeOf[T]) ValueType(ctx context.Context) attr.Value {
+	return {{ .TypeName }}ValueOf[T]{}
+}
+
+// ElementType returns the element type of this {{ .TypeName }}.
+func (t {{ .TypeName }}TypeOf[T]) ElementType() attr.Type {
+	return ElementTypeMust[T](context.Background())
 }

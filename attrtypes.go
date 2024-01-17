@@ -44,3 +44,28 @@ func AttributeTypes[T any](ctx context.Context) (map[string]attr.Type, error) {
 func AttributeTypesMust[T any](ctx context.Context) map[string]attr.Type {
 	return Must(AttributeTypes[T](ctx))
 }
+
+// ElementType returns the element type of the specified type T.
+// T must be a slice or map and reflection is used to find the element type.
+func ElementType[T any](_ context.Context) (attr.Type, error) {
+	var t T
+	val := reflect.ValueOf(t)
+	typ := val.Type()
+
+	switch typ.Kind() {
+	case reflect.String:
+		return StringType{}, nil
+	case reflect.Bool:
+		return BoolType{}, nil
+	case reflect.Int64:
+		return Int64Type{}, nil
+	case reflect.Float64:
+		return Float64Type{}, nil
+	default:
+		return nil, fmt.Errorf("%T has unsupported type: %s", t, typ)
+	}
+}
+
+func ElementTypeMust[T any](ctx context.Context) attr.Type {
+	return Must(ElementType[T](ctx))
+}
