@@ -3,6 +3,7 @@
 ### :dependabot: **Dependencies**
 
 * deps: bumps actions/checkout from 4.1.0 to 4.1.1 (GH-39)
+* deps: bumps actions/upload-artifact from 3 to 4 (GH-47)
 * deps: bumps github.com/fatih/color from 1.15.0 to 1.16.0 (GH-42)
 * deps: bumps github.com/hashicorp/terraform-plugin-go from 0.19.0 to 0.19.1 (GH-44)
 
