@@ -1,5 +1,11 @@
 ## 0.3.0 (Unreleased)
 
+### :rocket: **New Features**
+
+* `attribute/ListAttributeOf` - Add list attribute with generic type for automatically cast value to type of attribute. (GH-49)
+* `attribute/MapAttributeOf` - Add map attribute with generic type for automatically cast value to type of attribute. (GH-49)
+* `attribute/SetAttributeOf` - Add set attribute with generic type for automatically cast value to type of attribute. (GH-49)
+
 ### :dependabot: **Dependencies**
 
 * deps: bumps actions/checkout from 4.1.0 to 4.1.1 (GH-39)
