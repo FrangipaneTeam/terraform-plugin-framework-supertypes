@@ -14,6 +14,9 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var _ basetypes.SetValuable = SetValue{}
+var _ basetypes.SetValuable = SetValueOf[struct{}]{}
+
+// * SetType
 
 type SetValue struct {
 	basetypes.SetValue
@@ -93,4 +96,91 @@ func (v *SetValue) SetUnknown(ctx context.Context) {
 
 func (v SetValue) IsKnown() bool {
 	return !v.SetValue.IsNull() && !v.SetValue.IsUnknown()
+}
+
+// * SetTypeOf
+
+type SetValueOf[T any] struct {
+	basetypes.SetValue
+}
+
+// ToSetValue converts the given value to a SetValue.
+func (v SetValueOf[T]) ToSetValue(_ context.Context) (basetypes.SetValue, diag.Diagnostics) {
+	return v.SetValue, nil
+}
+
+// Equal returns true if the given value is equal to this value.
+func (v SetValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.(SetValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.SetValue.Equal(other.SetValue)
+}
+
+// Type returns the type of this value.
+func (v SetValueOf[T]) Type(ctx context.Context) attr.Type {
+	return NewSetTypeOf[T](ctx)
+}
+
+// Get returns a SetValueOf from the given value.
+func (v SetValueOf[T]) Get(ctx context.Context) (values []T, diags diag.Diagnostics) {
+
+	values = make([]T, len(v.SetValue.Elements()))
+
+	diags.Append(v.SetValue.ElementsAs(ctx, &values, false)...)
+	return
+}
+
+// Set sets the value of this value.
+func (v *SetValueOf[T]) Set(ctx context.Context, elements []T) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.SetValue, d = types.SetValueFrom(ctx, v.ElementType(ctx), elements)
+	return d
+}
+
+// NewSetValueOfUnknown returns a new SetValueOf with an unknown value.
+func NewSetValueOfUnknown[T any](ctx context.Context) SetValueOf[T] {
+	return SetValueOf[T]{
+		SetValue: basetypes.NewSetUnknown(ElementTypeMust[T](ctx)),
+	}
+}
+
+// NewSetValueOfNull returns a new SetValueOf with a null value.
+func NewSetValueOfNull[T any](ctx context.Context) SetValueOf[T] {
+	return SetValueOf[T]{
+		SetValue: basetypes.NewSetNull(ElementTypeMust[T](ctx)),
+	}
+}
+
+// newSetValueOf is a helper function to create a new SetValueOf.
+func newSetValueOf[T any](ctx context.Context, elements any) SetValueOf[T] {
+	return SetValueOf[T]{SetValue: MustDiag(basetypes.NewSetValueFrom(ctx, ElementTypeMust[T](ctx), elements))}
+}
+
+// NewSetValueOfSlice returns a new SetValueOf with the given slice value.
+func NewSetValueOfSlice[T any](ctx context.Context, elements []T) SetValueOf[T] {
+	return newSetValueOf[T](ctx, elements)
+}
+
+// NewSetValueOfSlicePtr returns a new SetValueOf with the given slice value.
+func NewSetValueOfSlicePtr[T any](ctx context.Context, elements []*T) SetValueOf[T] {
+	return newSetValueOf[T](ctx, elements)
+}
+
+// IsKnown returns true if the value is known.
+func (v SetValueOf[T]) IsKnown() bool {
+	return !v.SetValue.IsNull() && !v.SetValue.IsUnknown()
+}
+
+// SetNull sets the value to null.
+func (v *SetValueOf[T]) SetNull(ctx context.Context) {
+	(*v) = NewSetValueOfNull[T](ctx)
+}
+
+// SetUnknown sets the value to unknown.
+func (v *SetValueOf[T]) SetUnknown(ctx context.Context) {
+	(*v) = NewSetValueOfUnknown[T](ctx)
 }

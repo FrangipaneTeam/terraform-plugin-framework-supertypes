@@ -336,7 +336,7 @@ func TestListTypeString(t *testing.T) {
 		},
 		"ElemType-missing": {
 			input:    ListType{},
-			expected: "supertypes.ListType[!!! MISSING TYPE !!!]",
+			expected: "supertypes.ListType[!!! SUPER MISSING TYPE !!!]",
 		},
 	}
 

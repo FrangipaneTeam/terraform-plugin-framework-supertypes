@@ -14,6 +14,9 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var _ basetypes.ListValuable = ListValue{}
+var _ basetypes.ListValuable = ListValueOf[struct{}]{}
+
+// * ListType
 
 type ListValue struct {
 	basetypes.ListValue
@@ -93,4 +96,91 @@ func (v *ListValue) SetUnknown(ctx context.Context) {
 
 func (v ListValue) IsKnown() bool {
 	return !v.ListValue.IsNull() && !v.ListValue.IsUnknown()
+}
+
+// * ListTypeOf
+
+type ListValueOf[T any] struct {
+	basetypes.ListValue
+}
+
+// ToListValue converts the given value to a ListValue.
+func (v ListValueOf[T]) ToListValue(_ context.Context) (basetypes.ListValue, diag.Diagnostics) {
+	return v.ListValue, nil
+}
+
+// Equal returns true if the given value is equal to this value.
+func (v ListValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.(ListValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.ListValue.Equal(other.ListValue)
+}
+
+// Type returns the type of this value.
+func (v ListValueOf[T]) Type(ctx context.Context) attr.Type {
+	return NewListTypeOf[T](ctx)
+}
+
+// Get returns a ListValueOf from the given value.
+func (v ListValueOf[T]) Get(ctx context.Context) (values []T, diags diag.Diagnostics) {
+
+	values = make([]T, len(v.ListValue.Elements()))
+
+	diags.Append(v.ListValue.ElementsAs(ctx, &values, false)...)
+	return
+}
+
+// Set sets the value of this value.
+func (v *ListValueOf[T]) Set(ctx context.Context, elements []T) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.ListValue, d = types.ListValueFrom(ctx, v.ElementType(ctx), elements)
+	return d
+}
+
+// NewListValueOfUnknown returns a new ListValueOf with an unknown value.
+func NewListValueOfUnknown[T any](ctx context.Context) ListValueOf[T] {
+	return ListValueOf[T]{
+		ListValue: basetypes.NewListUnknown(ElementTypeMust[T](ctx)),
+	}
+}
+
+// NewListValueOfNull returns a new ListValueOf with a null value.
+func NewListValueOfNull[T any](ctx context.Context) ListValueOf[T] {
+	return ListValueOf[T]{
+		ListValue: basetypes.NewListNull(ElementTypeMust[T](ctx)),
+	}
+}
+
+// newListValueOf is a helper function to create a new ListValueOf.
+func newListValueOf[T any](ctx context.Context, elements any) ListValueOf[T] {
+	return ListValueOf[T]{ListValue: MustDiag(basetypes.NewListValueFrom(ctx, ElementTypeMust[T](ctx), elements))}
+}
+
+// NewListValueOfSlice returns a new ListValueOf with the given slice value.
+func NewListValueOfSlice[T any](ctx context.Context, elements []T) ListValueOf[T] {
+	return newListValueOf[T](ctx, elements)
+}
+
+// NewListValueOfSlicePtr returns a new ListValueOf with the given slice value.
+func NewListValueOfSlicePtr[T any](ctx context.Context, elements []*T) ListValueOf[T] {
+	return newListValueOf[T](ctx, elements)
+}
+
+// IsKnown returns true if the value is known.
+func (v ListValueOf[T]) IsKnown() bool {
+	return !v.ListValue.IsNull() && !v.ListValue.IsUnknown()
+}
+
+// SetNull sets the value to null.
+func (v *ListValueOf[T]) SetNull(ctx context.Context) {
+	(*v) = NewListValueOfNull[T](ctx)
+}
+
+// SetUnknown sets the value to unknown.
+func (v *ListValueOf[T]) SetUnknown(ctx context.Context) {
+	(*v) = NewListValueOfUnknown[T](ctx)
 }

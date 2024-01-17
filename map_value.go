@@ -14,6 +14,9 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var _ basetypes.MapValuable = MapValue{}
+var _ basetypes.MapValuable = MapValueOf[struct{}]{}
+
+// * MapType
 
 type MapValue struct {
 	basetypes.MapValue
@@ -93,4 +96,91 @@ func (v *MapValue) SetUnknown(ctx context.Context) {
 
 func (v MapValue) IsKnown() bool {
 	return !v.MapValue.IsNull() && !v.MapValue.IsUnknown()
+}
+
+// * MapTypeOf
+
+type MapValueOf[T any] struct {
+	basetypes.MapValue
+}
+
+// ToMapValue converts the given value to a MapValue.
+func (v MapValueOf[T]) ToMapValue(_ context.Context) (basetypes.MapValue, diag.Diagnostics) {
+	return v.MapValue, nil
+}
+
+// Equal returns true if the given value is equal to this value.
+func (v MapValueOf[T]) Equal(o attr.Value) bool {
+	other, ok := o.(MapValueOf[T])
+
+	if !ok {
+		return false
+	}
+
+	return v.MapValue.Equal(other.MapValue)
+}
+
+// Type returns the type of this value.
+func (v MapValueOf[T]) Type(ctx context.Context) attr.Type {
+	return NewMapTypeOf[T](ctx)
+}
+
+// Get returns a MapValueOf from the given value.
+func (v MapValueOf[T]) Get(ctx context.Context) (values map[string]T, diags diag.Diagnostics) {
+
+	values = make(map[string]T, len(v.MapValue.Elements()))
+
+	diags.Append(v.MapValue.ElementsAs(ctx, &values, false)...)
+	return
+}
+
+// Set sets the value of this value.
+func (v *MapValueOf[T]) Set(ctx context.Context, elements map[string]T) diag.Diagnostics {
+	var d diag.Diagnostics
+	v.MapValue, d = types.MapValueFrom(ctx, v.ElementType(ctx), elements)
+	return d
+}
+
+// NewMapValueOfUnknown returns a new MapValueOf with an unknown value.
+func NewMapValueOfUnknown[T any](ctx context.Context) MapValueOf[T] {
+	return MapValueOf[T]{
+		MapValue: basetypes.NewMapUnknown(ElementTypeMust[T](ctx)),
+	}
+}
+
+// NewMapValueOfNull returns a new MapValueOf with a null value.
+func NewMapValueOfNull[T any](ctx context.Context) MapValueOf[T] {
+	return MapValueOf[T]{
+		MapValue: basetypes.NewMapNull(ElementTypeMust[T](ctx)),
+	}
+}
+
+// newMapValueOf is a helper function to create a new MapValueOf.
+func newMapValueOf[T any](ctx context.Context, elements any) MapValueOf[T] {
+	return MapValueOf[T]{
+		MapValue: MustDiag(types.MapValueFrom(ctx, ElementTypeMust[T](ctx), elements)),
+	}
+}
+
+// NewMapValueOfMap returns a new MapValueOf with the given map value.
+func NewMapValueOfMap[T any](ctx context.Context, elements map[string]T) (MapValueOf[T], diag.Diagnostics) {
+	v, d := types.MapValueFrom(ctx, ElementTypeMust[T](ctx), elements)
+	return MapValueOf[T]{
+		MapValue: v,
+	}, d
+}
+
+// IsKnown returns true if the value is known.
+func (v MapValueOf[T]) IsKnown() bool {
+	return !v.MapValue.IsNull() && !v.MapValue.IsUnknown()
+}
+
+// SetNull sets the value to null.
+func (v *MapValueOf[T]) SetNull(ctx context.Context) {
+	(*v) = NewMapValueOfNull[T](ctx)
+}
+
+// SetUnknown sets the value to unknown.
+func (v *MapValueOf[T]) SetUnknown(ctx context.Context) {
+	(*v) = NewMapValueOfUnknown[T](ctx)
 }
