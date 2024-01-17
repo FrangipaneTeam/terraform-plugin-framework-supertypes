@@ -1,0 +1,11 @@
+```release-note:feature
+`attribute/SetAttributeOf` - Add set attribute with generic type for automatically cast value to type of attribute.
+```
+
+```release-note:feature
+`attribute/ListAttributeOf` - Add list attribute with generic type for automatically cast value to type of attribute.
+```
+
+```release-note:feature
+`attribute/MapAttributeOf` - Add map attribute with generic type for automatically cast value to type of attribute.
+```
