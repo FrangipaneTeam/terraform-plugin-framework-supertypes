@@ -190,9 +190,15 @@ func (t {{ .TypeName }}NestedObjectTypeOf[T]) NewObjectPtr(ctx context.Context) 
 	return nestedObjectTypeNewObjectPtr[T](ctx)
 }
 
+{{ if eq .TypeName "Map" -}}
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) NewObjectSlice(ctx context.Context, _, _ int) (any, diag.Diagnostics) {
+	return nestedMapTypeNewMap[T](ctx)
+}
+{{ else -}}
 func (t {{ .TypeName }}NestedObjectTypeOf[T]) NewObjectSlice(ctx context.Context, len, cap int) (any, diag.Diagnostics) {
 	return nestedObjectTypeNewObjectSlice[T](ctx, len, cap)
 }
+{{ end -}}
 
 func (t {{ .TypeName }}NestedObjectTypeOf[T]) NullValue(ctx context.Context) (attr.Value, diag.Diagnostics) {
 	var diags diag.Diagnostics
@@ -200,6 +206,18 @@ func (t {{ .TypeName }}NestedObjectTypeOf[T]) NullValue(ctx context.Context) (at
 	return New{{ .TypeName }}NestedObjectValueOfNull[T](ctx), diags
 }
 
+{{ if eq .TypeName "Map" -}}
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectPtr(ctx context.Context, ptr any) (attr.Value, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	if v, ok := ptr.(map[string]*T); ok {
+		return New{{ .TypeName }}NestedObjectValueOfPtr(ctx, v), diags
+	}
+
+	diags.Append(diag.NewErrorDiagnostic("Invalid map value", fmt.Sprintf("incorrect type: want %T, got %T", (map[string]*T)(nil), ptr)))
+	return nil, diags
+}
+{{ else -}}
 func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectPtr(ctx context.Context, ptr any) (attr.Value, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
@@ -210,14 +228,27 @@ func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectPtr(ctx context.Con
 	diags.Append(diag.NewErrorDiagnostic("Invalid pointer value", fmt.Sprintf("incorrect type: want %T, got %T", (*T)(nil), ptr)))
 	return nil, diags
 }
+{{ end -}}
 
+{{ if eq .TypeName "Map" -}}
 func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectSlice(ctx context.Context, slice any) (attr.Value, diag.Diagnostics) {
+{{ else -}}
+func (t {{ .TypeName }}NestedObjectTypeOf[T]) ValueFromObjectSlice(ctx context.Context, slice any) (attr.Value, diag.Diagnostics) {
+{{ end -}}
+
 	var diags diag.Diagnostics
 
+	{{ if eq .TypeName "Map" -}}
+	if v, ok := slice.(map[string]*T); ok {
+		return New{{ .TypeName }}NestedObjectValueOfMap(ctx, v), diags
+	}
+	diags.Append(diag.NewErrorDiagnostic("Invalid slice value", fmt.Sprintf("incorrect type: want %T, got %T", (map[string]*T)(nil), slice)))
+	return nil, diags
+	{{ else -}}
 	if v, ok := slice.([]*T); ok {
 		return New{{ .TypeName }}NestedObjectValueOfSlice(ctx, v), diags
 	}
-
 	diags.Append(diag.NewErrorDiagnostic("Invalid slice value", fmt.Sprintf("incorrect type: want %T, got %T", (*[]T)(nil), slice)))
 	return nil, diags
+	{{ end -}}
 }

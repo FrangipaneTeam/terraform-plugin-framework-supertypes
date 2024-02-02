@@ -102,7 +102,6 @@ func (v *SetNestedObjectValueOf[T]) Set(ctx context.Context, slice []*T) diag.Di
 	v.SetValue, diags = basetypes.NewSetValueFrom(ctx, NewObjectTypeOf[T](ctx), slice)
 	return diags
 }
-
 func NewSetNestedObjectValueOfNull[T any](ctx context.Context) SetNestedObjectValueOf[T] {
 	return SetNestedObjectValueOf[T]{SetValue: basetypes.NewSetNull(NewObjectTypeOf[T](ctx))}
 }
@@ -114,15 +113,12 @@ func NewSetNestedObjectValueOfUnknown[T any](ctx context.Context) SetNestedObjec
 func NewSetNestedObjectValueOfPtr[T any](ctx context.Context, t *T) SetNestedObjectValueOf[T] {
 	return NewSetNestedObjectValueOfSlice(ctx, []*T{t})
 }
-
 func NewSetNestedObjectValueOfSlice[T any](ctx context.Context, ts []*T) SetNestedObjectValueOf[T] {
 	return newSetNestedObjectValueOf[T](ctx, ts)
 }
-
 func NewSetNestedObjectValueOfValueSlice[T any](ctx context.Context, ts []T) SetNestedObjectValueOf[T] {
 	return newSetNestedObjectValueOf[T](ctx, ts)
 }
-
 func newSetNestedObjectValueOf[T any](ctx context.Context, elements any) SetNestedObjectValueOf[T] {
 	return SetNestedObjectValueOf[T]{SetValue: MustDiag(basetypes.NewSetValueFrom(ctx, NewObjectTypeOf[T](ctx), elements))}
 }

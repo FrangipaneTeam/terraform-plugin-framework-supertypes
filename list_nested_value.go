@@ -102,7 +102,6 @@ func (v *ListNestedObjectValueOf[T]) Set(ctx context.Context, slice []*T) diag.D
 	v.ListValue, diags = basetypes.NewListValueFrom(ctx, NewObjectTypeOf[T](ctx), slice)
 	return diags
 }
-
 func NewListNestedObjectValueOfNull[T any](ctx context.Context) ListNestedObjectValueOf[T] {
 	return ListNestedObjectValueOf[T]{ListValue: basetypes.NewListNull(NewObjectTypeOf[T](ctx))}
 }
@@ -114,15 +113,12 @@ func NewListNestedObjectValueOfUnknown[T any](ctx context.Context) ListNestedObj
 func NewListNestedObjectValueOfPtr[T any](ctx context.Context, t *T) ListNestedObjectValueOf[T] {
 	return NewListNestedObjectValueOfSlice(ctx, []*T{t})
 }
-
 func NewListNestedObjectValueOfSlice[T any](ctx context.Context, ts []*T) ListNestedObjectValueOf[T] {
 	return newListNestedObjectValueOf[T](ctx, ts)
 }
-
 func NewListNestedObjectValueOfValueSlice[T any](ctx context.Context, ts []T) ListNestedObjectValueOf[T] {
 	return newListNestedObjectValueOf[T](ctx, ts)
 }
-
 func newListNestedObjectValueOf[T any](ctx context.Context, elements any) ListNestedObjectValueOf[T] {
 	return ListNestedObjectValueOf[T]{ListValue: MustDiag(basetypes.NewListValueFrom(ctx, NewObjectTypeOf[T](ctx), elements))}
 }
