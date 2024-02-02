@@ -102,11 +102,19 @@ func (v {{ .TypeName }}NestedObjectValueOf[T]) Get(ctx context.Context) ([]*T, d
 {{ end -}}
 
 // Set returns a {{ .TypeName }}NestedObjectValueOf from a slice of pointers to the elements of a {{ .TypeName }}NestedObject.
+{{ if eq .TypeName "Map" -}}
+func (v *{{ .TypeName }}NestedObjectValueOf[T]) Set(ctx context.Context, m map[string]*T) diag.Diagnostics {
+	var diags diag.Diagnostics
+	v.{{ .TypeName }}Value, diags = basetypes.New{{ .TypeName }}ValueFrom(ctx, NewObjectTypeOf[T](ctx), m)
+	return diags
+}
+{{ else -}}
 func (v *{{ .TypeName }}NestedObjectValueOf[T]) Set(ctx context.Context, slice []*T) diag.Diagnostics {
 	var diags diag.Diagnostics
 	v.{{ .TypeName }}Value, diags = basetypes.New{{ .TypeName }}ValueFrom(ctx, NewObjectTypeOf[T](ctx), slice)
 	return diags
 }
+{{ end -}}
 
 func New{{ .TypeName }}NestedObjectValueOfNull[T any](ctx context.Context) {{ .TypeName }}NestedObjectValueOf[T] {
 	return {{ .TypeName }}NestedObjectValueOf[T]{ {{ .TypeName }}Value: basetypes.New{{ .TypeName }}Null(NewObjectTypeOf[T](ctx))}
@@ -116,17 +124,35 @@ func New{{ .TypeName }}NestedObjectValueOfUnknown[T any](ctx context.Context) {{
 	return {{ .TypeName }}NestedObjectValueOf[T]{ {{ .TypeName }}Value: basetypes.New{{ .TypeName }}Unknown(NewObjectTypeOf[T](ctx))}
 }
 
+{{ if eq .TypeName "Map" -}}
+func New{{ .TypeName }}NestedObjectValueOfPtr[T any](ctx context.Context, m map[string]*T) {{ .TypeName }}NestedObjectValueOf[T] {
+	return New{{ .TypeName }}NestedObjectValueOfMap(ctx, m)
+}
+{{ else -}}
 func New{{ .TypeName }}NestedObjectValueOfPtr[T any](ctx context.Context, t *T) {{ .TypeName }}NestedObjectValueOf[T] {
 	return New{{ .TypeName }}NestedObjectValueOfSlice(ctx, []*T{t})
 }
+{{ end -}}
 
+{{ if eq .TypeName "Map" -}}
+func New{{ .TypeName }}NestedObjectValueOfMap[T any](ctx context.Context, m map[string]*T) {{ .TypeName }}NestedObjectValueOf[T] {
+	return new{{ .TypeName }}NestedObjectValueOf[T](ctx, m)
+}
+{{ else -}}
 func New{{ .TypeName }}NestedObjectValueOfSlice[T any](ctx context.Context, ts []*T) {{ .TypeName }}NestedObjectValueOf[T] {
 	return new{{ .TypeName }}NestedObjectValueOf[T](ctx, ts)
 }
+{{ end -}}
 
+{{ if eq .TypeName "Map" -}}
+func New{{ .TypeName }}NestedObjectValueOfValueMap[T any](ctx context.Context, m map[string]T) {{ .TypeName }}NestedObjectValueOf[T] {
+	return new{{ .TypeName }}NestedObjectValueOf[T](ctx, m)
+}
+{{ else -}}
 func New{{ .TypeName }}NestedObjectValueOfValueSlice[T any](ctx context.Context, ts []T) {{ .TypeName }}NestedObjectValueOf[T] {
 	return new{{ .TypeName }}NestedObjectValueOf[T](ctx, ts)
 }
+{{ end -}}
 
 func new{{ .TypeName }}NestedObjectValueOf[T any](ctx context.Context, elements any) {{ .TypeName }}NestedObjectValueOf[T] {
 	return {{ .TypeName }}NestedObjectValueOf[T]{ {{ .TypeName }}Value: MustDiag(basetypes.New{{ .TypeName }}ValueFrom(ctx, NewObjectTypeOf[T](ctx), elements))}

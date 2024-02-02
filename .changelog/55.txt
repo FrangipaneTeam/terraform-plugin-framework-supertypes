@@ -1,0 +1,3 @@
+```release-note:bug
+`MapNestedValueOF` - Fix wrong parameter for the funcs `Get()` and `Set()`.
+```

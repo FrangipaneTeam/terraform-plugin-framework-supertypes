@@ -29,6 +29,12 @@ func nestedObjectTypeNewObjectSlice[T any](_ context.Context, xlen, xcap int) ([
 	return make([]*T, xlen, xcap), diags
 }
 
+func nestedMapTypeNewMap[T any](_ context.Context) (map[string]*T, diag.Diagnostics) {
+	var diags diag.Diagnostics
+
+	return make(map[string]*T), diags
+}
+
 func nestedObjectValueSlice[T any](ctx context.Context, val valueWithElements) ([]*T, diag.Diagnostics) {
 	var diags diag.Diagnostics
 

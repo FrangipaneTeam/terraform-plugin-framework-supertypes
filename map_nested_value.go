@@ -97,12 +97,11 @@ func (v MapNestedObjectValueOf[T]) Get(ctx context.Context) (map[string]*T, diag
 }
 
 // Set returns a MapNestedObjectValueOf from a slice of pointers to the elements of a MapNestedObject.
-func (v *MapNestedObjectValueOf[T]) Set(ctx context.Context, slice []*T) diag.Diagnostics {
+func (v *MapNestedObjectValueOf[T]) Set(ctx context.Context, m map[string]*T) diag.Diagnostics {
 	var diags diag.Diagnostics
-	v.MapValue, diags = basetypes.NewMapValueFrom(ctx, NewObjectTypeOf[T](ctx), slice)
+	v.MapValue, diags = basetypes.NewMapValueFrom(ctx, NewObjectTypeOf[T](ctx), m)
 	return diags
 }
-
 func NewMapNestedObjectValueOfNull[T any](ctx context.Context) MapNestedObjectValueOf[T] {
 	return MapNestedObjectValueOf[T]{MapValue: basetypes.NewMapNull(NewObjectTypeOf[T](ctx))}
 }
@@ -111,18 +110,15 @@ func NewMapNestedObjectValueOfUnknown[T any](ctx context.Context) MapNestedObjec
 	return MapNestedObjectValueOf[T]{MapValue: basetypes.NewMapUnknown(NewObjectTypeOf[T](ctx))}
 }
 
-func NewMapNestedObjectValueOfPtr[T any](ctx context.Context, t *T) MapNestedObjectValueOf[T] {
-	return NewMapNestedObjectValueOfSlice(ctx, []*T{t})
+func NewMapNestedObjectValueOfPtr[T any](ctx context.Context, m map[string]*T) MapNestedObjectValueOf[T] {
+	return NewMapNestedObjectValueOfMap(ctx, m)
 }
-
-func NewMapNestedObjectValueOfSlice[T any](ctx context.Context, ts []*T) MapNestedObjectValueOf[T] {
-	return newMapNestedObjectValueOf[T](ctx, ts)
+func NewMapNestedObjectValueOfMap[T any](ctx context.Context, m map[string]*T) MapNestedObjectValueOf[T] {
+	return newMapNestedObjectValueOf[T](ctx, m)
 }
-
-func NewMapNestedObjectValueOfValueSlice[T any](ctx context.Context, ts []T) MapNestedObjectValueOf[T] {
-	return newMapNestedObjectValueOf[T](ctx, ts)
+func NewMapNestedObjectValueOfValueMap[T any](ctx context.Context, m map[string]T) MapNestedObjectValueOf[T] {
+	return newMapNestedObjectValueOf[T](ctx, m)
 }
-
 func newMapNestedObjectValueOf[T any](ctx context.Context, elements any) MapNestedObjectValueOf[T] {
 	return MapNestedObjectValueOf[T]{MapValue: MustDiag(basetypes.NewMapValueFrom(ctx, NewObjectTypeOf[T](ctx), elements))}
 }
