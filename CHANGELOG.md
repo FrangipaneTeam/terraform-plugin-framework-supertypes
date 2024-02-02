@@ -1,4 +1,9 @@
 ## 0.4.0 (Unreleased)
+
+### :bug: **Bug Fixes**
+
+* `MapNestedValueOF` - Fix wrong parameter for the funcs `Get()` and `Set()`. (GH-55)
+
 ## 0.3.0 (January 17, 2024)
 
 ### :rocket: **New Features**
