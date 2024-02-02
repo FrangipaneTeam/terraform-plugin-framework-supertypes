@@ -4,6 +4,10 @@
 
 * `MapNestedValueOF` - Fix wrong parameter for the funcs `Get()` and `Set()`. (GH-55)
 
+### :dependabot: **Dependencies**
+
+* deps: bumps github.com/hashicorp/terraform-plugin-go from 0.20.0 to 0.21.0 (GH-54)
+
 ## 0.3.0 (January 17, 2024)
 
 ### :rocket: **New Features**
