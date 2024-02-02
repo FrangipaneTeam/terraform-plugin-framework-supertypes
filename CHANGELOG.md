@@ -1,4 +1,5 @@
 ## 0.4.0 (Unreleased)
+## 0.3.1 (February  2, 2024)
 
 ### :bug: **Bug Fixes**
 
