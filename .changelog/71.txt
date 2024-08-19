@@ -1,0 +1,7 @@
+```release-note:note
+`linters` - Remove deprecated linters.
+```
+
+```release-note:breaking-change
+`golang` - Upgrade to Golang 1.21.
+```
