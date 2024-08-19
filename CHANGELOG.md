@@ -1,4 +1,10 @@
 ## 0.4.0 (Unreleased)
+### :rotating_light: **Breaking Changes**
+
+* `golang` - Upgrade to Golang 1.21. (GH-71)
+### :information_source: **Notes**
+
+* `linters` - Remove deprecated linters. (GH-71)
 
 ### :dependabot: **Dependencies**
 
