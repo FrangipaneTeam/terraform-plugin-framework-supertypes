@@ -159,9 +159,9 @@ func TestNewMapValueFrom(t *testing.T) {
 			expectedDiags: diag.Diagnostics{
 				diag.NewAttributeErrorDiagnostic(
 					path.Empty(),
-					"Map Type Validation Error",
-					errorTest+
-						"expected Map value, received tftypes.Value with value: tftypes.String<\"oops\">",
+					"Value Conversion Error",
+					errorTestConvert+
+						"can't use tftypes.String<\"oops\"> as value of MapValue, can only use tftypes.Map values",
 				),
 			},
 		},
@@ -173,7 +173,7 @@ func TestNewMapValueFrom(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Empty().AtMapKey("key1"),
 					"Value Conversion Error",
-					"An unexpected error was encountered trying to convert the Terraform value. This is always an error in the provider. Please report the following to the provider developer:\n\n"+
+					errorTestConvert+
 						"can't unmarshal tftypes.Bool into *string, expected string",
 				),
 			},
@@ -853,7 +853,7 @@ func TestMapTypeValidate(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
 					"Map Type Validation Error",
-					errorTest+
+					errorTestValidate+
 						"expected Map value, received tftypes.Value with value: tftypes.List[tftypes.String]<tftypes.String<\"testvalue\">>",
 				),
 			},
