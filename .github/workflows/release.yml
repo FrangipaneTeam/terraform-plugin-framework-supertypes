@@ -29,15 +29,15 @@ jobs:
     permissions:
       contents: write
     steps:
-    - id: release-notes-download
-      name: Release Notes Download
-      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
-      with:
-        name: release-notes
-        path: /tmp
-    - uses: ncipollo/release-action@6c75be85e571768fa31b40abf38de58ba0397db5 # v1.13.0
-      with:
-        bodyFile: "${{ steps.release-notes-download.outputs.download-path }}/release-notes.txt"
+      - id: release-notes-download
+        name: Release Notes Download
+        uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+        with:
+          name: release-notes
+          path: /tmp
+      - uses: ncipollo/release-action@2c591bcc8ecdcd2db72b97d6147f871fcd833ba5 # v1.14.0
+        with:
+          bodyFile: "${{ steps.release-notes-download.outputs.download-path }}/release-notes.txt"
 
   highest-version-tag:
     needs: [make-release]
