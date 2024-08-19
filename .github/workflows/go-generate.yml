@@ -13,16 +13,16 @@ jobs:
   go-generate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
       - run: go generate ./...
       - run: git status --ignored
       - name: git diff
         continue-on-error: true
         run: |
           git diff --compact-summary --exit-code
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        if: failure() # Run only if previous step have diff 
+      - uses: stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842 # v5.0.1
+        if: failure() # Run only if previous step have diff
         with:
           add_options: '--force'
           commit_message: 'ci(generate): changes by go generate'
