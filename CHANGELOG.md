@@ -1,4 +1,9 @@
 ## 0.4.0 (Unreleased)
+
+### :dependabot: **Dependencies**
+
+* deps: bumps dependabot/fetch-metadata from 1.6.0 to 2.2.0 (GH-66)
+
 ## 0.3.1 (February  2, 2024)
 
 ### :bug: **Bug Fixes**
