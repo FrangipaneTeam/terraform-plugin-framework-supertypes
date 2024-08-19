@@ -7,6 +7,7 @@
 * deps: bumps dependabot/fetch-metadata from 1.6.0 to 2.2.0 (GH-66)
 * deps: bumps github.com/hashicorp/terraform-plugin-go from 0.21.0 to 0.23.0 (GH-69)
 * deps: bumps github.com/stretchr/testify from 1.8.4 to 1.9.0 (GH-60)
+* deps: bumps golangci/golangci-lint-action from 3 to 6 (GH-70)
 * deps: bumps ncipollo/release-action from 1.13.0 to 1.14.0 (GH-57)
 
 ## 0.3.1 (February  2, 2024)
