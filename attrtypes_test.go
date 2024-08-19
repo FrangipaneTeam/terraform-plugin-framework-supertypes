@@ -36,7 +36,6 @@ func TestAttributeTypes(t *testing.T) {
 	}
 
 	got, err = supertypes.AttributeTypes[struct2](ctx)
-
 	if err != nil {
 		t.Fatalf("unexpected error")
 	}
