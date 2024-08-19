@@ -2,6 +2,8 @@
 
 ### :dependabot: **Dependencies**
 
+* deps: bumps actions/checkout from 4.1.1 to 4.1.7 (GH-68)
+* deps: bumps actions/download-artifact from 4.1.1 to 4.1.8 (GH-67)
 * deps: bumps dependabot/fetch-metadata from 1.6.0 to 2.2.0 (GH-66)
 
 ## 0.3.1 (February  2, 2024)
