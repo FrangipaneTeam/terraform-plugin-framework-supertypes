@@ -14,7 +14,8 @@ import (
 )
 
 const (
-	errorTest = "An unexpected error was encountered trying to validate an attribute value. This is always an error in the provider. Please report the following to the provider developer:\n\n"
+	errorTestValidate = "An unexpected error was encountered trying to validate an attribute value. This is always an error in the provider. Please report the following to the provider developer:\n\n"
+	errorTestConvert  = "An unexpected error was encountered trying to convert the Terraform value. This is always an error in the provider. Please report the following to the provider developer:\n\n"
 )
 
 func nestedObjectTypeNewObjectPtr[T any](_ context.Context) (*T, diag.Diagnostics) {

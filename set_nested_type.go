@@ -194,7 +194,6 @@ func (t SetNestedObjectTypeOf[T]) NewObjectPtr(ctx context.Context) (any, diag.D
 func (t SetNestedObjectTypeOf[T]) NewObjectSlice(ctx context.Context, len, cap int) (any, diag.Diagnostics) {
 	return nestedObjectTypeNewObjectSlice[T](ctx, len, cap)
 }
-
 func (t SetNestedObjectTypeOf[T]) NullValue(ctx context.Context) (attr.Value, diag.Diagnostics) {
 	var diags diag.Diagnostics
 

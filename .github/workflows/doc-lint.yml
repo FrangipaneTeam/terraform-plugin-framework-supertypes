@@ -1,11 +1,11 @@
 # This is a lint workflow for documentation and example to help you get started with Actions
 name: doc-lint
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
-    branches: [ master ]
+    branches: [master]
     paths:
     - 'docs/**'
     - '*.md'
@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       # Runs actions-markdownlint
-      - uses: articulate/actions-markdownlint@v1
+      - uses: articulate/actions-markdownlint@17b8abe7407cd17590c006ecc837c35e1ac3ed83 # v1.1.0
         with:
           config: .markdownlint.json
           files:

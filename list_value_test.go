@@ -161,9 +161,9 @@ func TestNewListValueFrom(t *testing.T) {
 			expectedDiags: diag.Diagnostics{
 				diag.NewAttributeErrorDiagnostic(
 					path.Empty(),
-					"List Type Validation Error",
-					errorTest+
-						"expected List value, received tftypes.Value with value: tftypes.String<\"oops\">",
+					"Value Conversion Error",
+					errorTestConvert+
+						"can't use tftypes.String<\"oops\"> as value of List with ElementType supertypes.StringType, can only use tftypes.String values",
 				),
 			},
 		},
@@ -175,7 +175,7 @@ func TestNewListValueFrom(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Empty().AtListIndex(0),
 					"Value Conversion Error",
-					"An unexpected error was encountered trying to convert the Terraform value. This is always an error in the provider. Please report the following to the provider developer:\n\n"+
+					errorTestConvert+
 						"can't unmarshal tftypes.Bool into *string, expected string",
 				),
 			},
@@ -774,7 +774,7 @@ func TestListTypeValidate(t *testing.T) {
 				diag.NewAttributeErrorDiagnostic(
 					path.Root("test"),
 					"List Type Validation Error",
-					errorTest+
+					errorTestValidate+
 						"expected List value, received tftypes.Value with value: tftypes.Set[tftypes.String]<tftypes.String<\"testvalue\">>",
 				),
 			},

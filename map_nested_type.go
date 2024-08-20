@@ -194,7 +194,6 @@ func (t MapNestedObjectTypeOf[T]) NewObjectPtr(ctx context.Context) (any, diag.D
 func (t MapNestedObjectTypeOf[T]) NewObjectSlice(ctx context.Context, _, _ int) (any, diag.Diagnostics) {
 	return nestedMapTypeNewMap[T](ctx)
 }
-
 func (t MapNestedObjectTypeOf[T]) NullValue(ctx context.Context) (attr.Value, diag.Diagnostics) {
 	var diags diag.Diagnostics
 
